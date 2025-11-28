@@ -126,6 +126,10 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False):
                 if qualities:
                     sorted_keys = sorted([k for k in qualities.keys() if isinstance(k, int)], reverse=True)
                     
+                    # Debug: Show available qualities
+                    console.print(f"[dim]Available qualities: {sorted_keys}[/]")
+                    console.print(f"[dim]Requested quality: {quality}[/]")
+                    
                     if quality == 'best':
                         selected_res = sorted_keys[0] if sorted_keys else list(qualities.keys())[0]
                     elif quality == 'worst':
