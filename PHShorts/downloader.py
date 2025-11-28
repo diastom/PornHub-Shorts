@@ -8,6 +8,7 @@ import sys
 import subprocess
 import html
 import time
+import json
 
 
 class CustomHLSDownloader:
@@ -86,25 +87,71 @@ class CustomHLSDownloader:
                     self.output_name = self.output_name.with_suffix('.ts')
 
             # --- M3U8 Extraction ---
-            # Pattern matching for various players
-            patterns = [
-                r'"videoUrl"\s*:\s*"([^"]+m3u8[^"]*)"',
-                r'src\s*:\s*"([^"]+m3u8[^"]*)"',
-                r'file\s*:\s*"([^"]+m3u8[^"]*)"',
-                r'(https?:\\?/\\?/[^"\s]+\.m3u8[^"\s]*)'
-            ]
-
-            for pattern in patterns:
-                matches = re.findall(pattern, html_content)
-                for match in matches:
-                    clean_url = match.replace('\\/', '/')
-                    if "master.m3u8" in clean_url or "index.m3u8" in clean_url:
-                        # Sometimes extracting only query params happens, ensure protocol
-                        if not clean_url.startswith('http'):
-                             continue 
-                        return clean_url
+            streams = {}
             
-            raise ValueError("No compatible HLS stream found in page source.")
+            # Method 1: Try to parse mediaDefinitions from flashvars
+            media_def_match = re.search(r'mediaDefinitions\s*[:=]\s*(\[.+?\])', html_content)
+            if media_def_match:
+                try:
+                    json_str = media_def_match.group(1)
+                    # Simple cleanup if needed (though usually valid JSON in PH)
+                    definitions = json.loads(json_str)
+                    
+                    for video in definitions:
+                        if video.get('format') == 'hls' and video.get('videoUrl'):
+                            video_url = video['videoUrl']
+                            if not video_url: continue
+                            
+                            # Fix slashes
+                            video_url = video_url.replace('\\/', '/')
+                            
+                            quality = video.get('quality')
+                            if isinstance(quality, list): quality = quality[0]
+                            
+                            if quality:
+                                try:
+                                    q_int = int(quality)
+                                    streams[q_int] = video_url
+                                except ValueError:
+                                    streams[quality] = video_url
+                            else:
+                                # Try to guess from URL
+                                q_match = re.search(r'(\d{3,4})[Pp]', video_url)
+                                if q_match:
+                                    streams[int(q_match.group(1))] = video_url
+                                else:
+                                    streams['unknown'] = video_url
+                except Exception as e:
+                    pass
+
+            # Method 2: Fallback to regex if no streams found
+            if not streams:
+                patterns = [
+                    r'"videoUrl"\s*:\s*"([^"]+m3u8[^"]*)"',
+                    r'src\s*:\s*"([^"]+m3u8[^"]*)"',
+                    r'file\s*:\s*"([^"]+m3u8[^"]*)"',
+                    r'(https?:\\?/\\?/[^"\s]+\.m3u8[^"\s]*)'
+                ]
+
+                for pattern in patterns:
+                    matches = re.findall(pattern, html_content)
+                    for match in matches:
+                        clean_url = match.replace('\\/', '/')
+                        if "master.m3u8" in clean_url or "index.m3u8" in clean_url:
+                            if not clean_url.startswith('http'):
+                                 continue
+                            
+                            # Try to extract quality from URL
+                            q_match = re.search(r'(\d{3,4})[Pp]', clean_url)
+                            if q_match:
+                                streams[int(q_match.group(1))] = clean_url
+                            else:
+                                streams['unknown'] = clean_url
+
+            if not streams:
+                raise ValueError("No compatible HLS stream found in page source.")
+            
+            return streams
 
         except requests.exceptions.ProxyError:
             raise ConnectionError("Cannot connect to proxy. Check your proxy settings.")

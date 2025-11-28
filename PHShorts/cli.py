@@ -108,11 +108,35 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False):
                 keep_ts=keep_ts,
                 proxy=proxy
             )
-            m3u8_url = downloader.extract_video_info(url)
+            streams = downloader.extract_video_info(url)
         
         console.print(f"[green]✓[/] Video: [bold]{downloader.output_name.stem}[/]")
         if proxy:
             console.print(f"[green]✓[/] Proxy: [bold]{proxy}[/]")
+            
+        # Select stream from available qualities
+        sorted_keys = sorted([k for k in streams.keys() if isinstance(k, int)], reverse=True)
+        console.print(f"[dim]Available qualities: {sorted_keys}[/]")
+        console.print(f"[dim]Requested quality: {quality}[/]")
+        
+        if quality == 'best':
+            selected_res = sorted_keys[0] if sorted_keys else list(streams.keys())[0]
+        elif quality == 'worst':
+            selected_res = sorted_keys[-1] if sorted_keys else list(streams.keys())[-1]
+        else:
+            try:
+                req_q = int(quality)
+                if req_q in streams:
+                    selected_res = req_q
+                elif sorted_keys:
+                    selected_res = min(sorted_keys, key=lambda x:abs(x-req_q))
+                else:
+                    selected_res = list(streams.keys())[0]
+            except ValueError:
+                selected_res = sorted_keys[0] if sorted_keys else list(streams.keys())[0]
+        
+        m3u8_url = streams[selected_res]
+        console.print(f"[green]✓[/] Selected Stream: [bold]{selected_res}p[/]")
         
         # Phase 2: Analyzing playlist
         with console.status("[bold cyan]📊 Analyzing stream quality...", spinner="dots"):
