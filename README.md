@@ -153,7 +153,7 @@ Options:
 ## 🔧 Requirements
 
 ### Required
-- Python 3.8 or higher
+- Python 3.10 or higher
 - Internet connection
 
 ### Optional (Recommended)
