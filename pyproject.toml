@@ -39,9 +39,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/ph-shorts"
-"Bug Tracker" = "https://github.com/yourusername/ph-shorts/issues"
-Documentation = "https://github.com/yourusername/ph-shorts#readme"
+Homepage = "https://github.com/diastom/PornHub-Shorts"
+"Bug Tracker" = "https://github.com/diastom/PornHub-Shorts/issues"
+Documentation = "https://github.com/diastom/PornHub-Shorts#readme"
 
 [project.scripts]
 ph-shorts = "PHShorts.cli:main"
