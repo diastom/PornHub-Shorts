@@ -15,6 +15,8 @@
 
 </div>
 
+> **ℹ️ Note:** Formerly known as **PornHub-Shorts** → Renamed to **RedLight DL** to support multiple adult content platforms.
+
 ---
 
 ## ✨ Features
