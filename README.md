@@ -122,51 +122,6 @@ ph-shorts "URL" -p http://127.0.0.1:1080
 ```bash
 ph-shorts "URL" --keep-ts
 ```
-
-### Combine options
-```bash
-ph-shorts "URL" -q 1080 -o "awesome_video.mp4" -p http://proxy:8080
-```
-
-## 🔧 Using as a Library
-
-PHShorts v1.0.6+ can be used as a Python library to build custom scripts, bots, and automation tools!
-
-### Quick Start
-
-```python
-from PHShorts import DownloadVideo
-
-# Simple one-liner download
-video_path = DownloadVideo("https://www.pornhub.com/view_video.php?viewkey=xxxxx")
-print(f"Downloaded: {video_path}")
-```
-
-### Get Video Information
-
-```python
-from PHShorts import GetVideoInfo
-
-info = GetVideoInfo("https://www.pornhub.com/...")
-print(f"Title: {info['title']}")
-print(f"Available Qualities: {info['available_qualities']}")
-```
-
-### Progress Tracking
-
-```python
-from PHShorts import VideoDownloader
-
-def progress(downloaded, total):
-    percent = (downloaded / total) * 100
-    print(f"Progress: {percent:.1f}%")
-
-downloader = VideoDownloader(output_dir="./videos")
-video_path = downloader.download(
-    url="https://www.pornhub.com/...",
-    quality="720",
-    on_progress=progress
-)
 ```
 
 ### Async Support (for Bots)

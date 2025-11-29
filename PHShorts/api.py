@@ -15,6 +15,7 @@ def DownloadVideo(
     output_dir: str = "./downloads",
     quality: str = "best",
     filename: Optional[str] = None,
+    keep_ts: bool = False,
     on_progress: Optional[Callable[[int, int], None]] = None
 ) -> str:
     """
@@ -24,7 +25,9 @@ def DownloadVideo(
         url: Video URL (e.g., https://pornhub.com/view_video.php?viewkey=xxxxx)
         output_dir: Directory to save the video (default: "./downloads")
         quality: Video quality - "best", "worst", or specific height like "720" (default: "best")
+        quality: Video quality - "best", "worst", or specific height like "720" (default: "best")
         filename: Custom filename (optional, auto-detected from video title if not provided)
+        keep_ts: If True, keep original .ts file (skips MP4 conversion)
         on_progress: Callback function (downloaded_segments, total_segments) for progress tracking
     
     Returns:
@@ -47,6 +50,7 @@ def DownloadVideo(
     # Initialize downloader
     downloader = CustomHLSDownloader(
         output_name=str(output_file) if output_file else None,
+        keep_ts=keep_ts,
         progress_callback=on_progress
     )
     
@@ -183,6 +187,7 @@ class VideoDownloader:
         url: str,
         quality: str = "best",
         filename: Optional[str] = None,
+        keep_ts: bool = False,
         on_progress: Optional[Callable[[int, int], None]] = None
     ) -> str:
         """
@@ -202,6 +207,7 @@ class VideoDownloader:
             output_dir=str(self.output_dir),
             quality=quality,
             filename=filename,
+            keep_ts=keep_ts,
             on_progress=on_progress
         )
     

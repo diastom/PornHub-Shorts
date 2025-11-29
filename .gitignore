@@ -214,3 +214,5 @@ __marimo__/
 *.ts
 temp_segments/
 build_entry.py
+*.mkv
+*.webm
