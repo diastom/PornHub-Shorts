@@ -2,15 +2,15 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.6-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.7-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 **Download PornHub Shorts videos with style!** ✨
 
-*A lightweight, specialized downloader with a beautiful CLI*
+*A powerful, feature-rich downloader with a beautiful CLI and comprehensive Python API*
 
-[Installation](#-installation) • [Usage](#-usage) • [Examples](#-examples)
+[Installation](#-installation) • [Features](#-features) • [Usage](#-usage) • [Examples](#-examples)
 
 </div>
 
@@ -18,17 +18,29 @@
 
 ## ✨ Features
 
-- 🎯 **Specialized** - Built specifically for PornHub Shorts
-- 📚 **Programmable API** - Use as a Python library to build custom scripts and bots
-- 🎨 **Beautiful CLI** - Rich terminal UI with colors and progress bars
-- 🚀 **Fast Downloads** - Multi-threaded segment downloading
-- 📺 **Quality Selection** - Choose from available qualities (1080p, 720p, 480p, etc.)
-- 🌐 **Proxy Support** - Built-in HTTP/HTTPS proxy support
-- ⚡ **Async Support** - Perfect for Telegram/Discord bot integration
-- 🔄 **Auto-conversion** - Automatic conversion to MP4 (requires FFmpeg)
-- 💾 **Smart Naming** - Automatically extracts and sanitizes video titles
-- 🔁 **Retry Logic** - Auto-retry failed segments
-- 🖥️ **Cross-platform** - Works on Windows, Linux, and macOS
+### 🎯 Core Features
+- **Specialized** - Built specifically for PornHub Shorts
+- **Beautiful CLI** - Rich terminal UI with colors and progress bars
+- **Fast Downloads** - Multi-threaded segment downloading
+- **Quality Selection** - Choose from available qualities (1080p, 720p, 480p, etc.)
+- **Proxy Support** - Built-in HTTP/HTTPS proxy support
+- **Smart Naming** - Automatically extracts and sanitizes video titles
+- **Cross-platform** - Works on Windows, Linux, and macOS
+
+### 🆕 New in v1.0.7
+- 📦 **Batch Downloads** - Download multiple videos concurrently or sequentially
+- 📺 **Playlist/Channel Support** - Download entire channels with one command
+- 🔍 **Advanced Search** - Search with filters (duration, sort by views/rating/date)
+- 🔄 **Format Conversion** - Convert to MP4/WebM/MKV, compress videos, extract audio
+- 📝 **Metadata Editor** - Edit video tags and thumbnails (API)
+- 🛠️ **Enhanced API** - Comprehensive Python library for automation
+
+### 🔧 Developer Features
+- **Programmable API** - Use as a Python library to build custom scripts and bots
+- **Async Support** - Perfect for Telegram/Discord bot integration
+- **Type Hints** - Full type hinting for better IDE support
+- **Progress Callbacks** - Track download progress in your applications
+
 
 ## 📦 Installation
 
@@ -97,6 +109,52 @@ ph-shorts "VIDEO_URL" [OPTIONS]
 ```
 
 ## 📝 Examples
+
+### v1.0.7 New Features
+
+#### Batch Download
+```bash
+# Download multiple videos concurrently
+ph-shorts --batch "url1, url2, url3" --concurrent
+
+# Download sequentially (more stable)
+ph-shorts --batch "url1, url2, url3"
+```
+
+#### Channel/Playlist Download
+```bash
+# Download entire channel (limit 10 videos)
+ph-shorts --channel "pornhub_user" --limit 10
+
+# Download with concurrent mode
+ph-shorts --channel "https://www.pornhub.com/model/username" --limit 5 --concurrent
+```
+
+#### Advanced Search
+```bash
+# Search and filter
+ph-shorts --search "query" --sort mostviewed --duration short
+
+# Sort options: mostviewed, toprated, newest
+# Duration: short (<10m), medium (10-20m), long (>20m)
+```
+
+#### Format Conversion
+```bash
+# Convert to WebM
+ph-shorts "URL" --format webm
+
+# Compress video (quality 0-100)
+ph-shorts "URL" --compress 70
+
+# Extract audio only (MP3)
+ph-shorts "URL" --audio-only
+
+# Combine options
+ph-shorts "URL" --format mkv --compress 80
+```
+
+### Basic Examples
 
 ### Basic download (best quality)
 ```bash
