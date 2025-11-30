@@ -35,7 +35,7 @@ from .sites.pornhub import PornHubDownloader
 from .sites.eporner import EpornerDownloader, EpornerSearch
 from .multi_search import MultiSiteSearch
 
-__version__ = "1.0.10"
+__version__ = "1.0.11"
 __author__ = "RedLight Team"
 __description__ = "RedLight DL - Professional adult content downloader with CLI & API"
 

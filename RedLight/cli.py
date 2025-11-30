@@ -32,7 +32,7 @@ BANNER = """
 [bold cyan]║[/]  [bold magenta]╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   [/]  [bold cyan]║[/]
 [bold cyan]║[/]          [bold yellow]Professional Adult Content Downloader[/]              [bold cyan]║[/]
 [bold cyan]╚══════════════════════════════════════════════════════════════════╝[/]
-                [dim]version 1.0.10 • RedLight DL[/]
+                [dim]version 1.0.11 • RedLight DL[/]
 """
 
 
@@ -81,6 +81,10 @@ def show_stats(ctx, param, value):
 
 def interactive_mode():
     """Interactive mode with beautiful prompts"""
+
+    from rich.table import Table
+    from rich import box
+
     show_banner()
     
     while True:
