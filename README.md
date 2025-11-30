@@ -5,6 +5,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.11-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/ph-shorts?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/ph-shorts)
 
 **Professional Adult Content Downloader with Style!** ✨
 
