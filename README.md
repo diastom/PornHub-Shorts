@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.12-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.13-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/ph-shorts?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/ph-shorts)
@@ -27,6 +27,7 @@ this tool is made by AI in google **antigravity**
 - **PornHub** - HLS streaming downloads with full quality selection
 - **Eporner** - Direct MP4 downloads with aria2c support
 - **Spankbang** - Hybrid Delivery MP4/HLS with aria2c support
+- **XVideos** - Multi-quality MP4/HLS downloads with intelligent fallback
 
 More sites coming soon! The architecture is designed for easy integration of new platforms.
 

@@ -7,6 +7,7 @@ from .base import BaseSiteDownloader, BaseSiteSearch
 from .pornhub import PornHubDownloader, PornHubSearch
 from .eporner import EpornerDownloader, EpornerSearch
 from .spankbang import SpankBangDownloader, SpankBangSearch
+from .xvideos import XVideosDownloader, XVideosSearch
 
 
 class SiteRegistry:
@@ -23,10 +24,10 @@ class SiteRegistry:
         if cls._instance is None:
             cls._instance = super(SiteRegistry, cls).__new__(cls)
             cls._instance._sites = {}
-            # Auto-register sites
             cls._instance.register_site("pornhub", PornHubDownloader, PornHubSearch)
             cls._instance.register_site("eporner", EpornerDownloader, EpornerSearch)
             cls._instance.register_site("spankbang", SpankBangDownloader, SpankBangSearch)
+            cls._instance.register_site("xvideos", XVideosDownloader, XVideosSearch)
         return cls._instance
     
     def register_site(

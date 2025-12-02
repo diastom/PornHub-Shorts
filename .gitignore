@@ -216,3 +216,4 @@ temp_segments/
 build_entry.py
 *.mkv
 *.webm
+aria2c.exe 

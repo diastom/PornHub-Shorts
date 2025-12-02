@@ -10,22 +10,33 @@ from .registry import SiteRegistry
 # Import site implementations
 from .pornhub import PornHubDownloader, PornHubSearch
 from .eporner import EpornerDownloader, EpornerSearch
+from .spankbang import SpankBangDownloader, SpankBangSearch
+from .xvideos import XVideosDownloader, XVideosSearch
 
-# Initialize registry and register all sites
 _registry = SiteRegistry()
 
-# Register PornHub
 _registry.register_site(
     name="pornhub",
     downloader_class=PornHubDownloader,
     search_class=PornHubSearch
 )
 
-# Register Eporner
 _registry.register_site(
     name="eporner",
     downloader_class=EpornerDownloader,
     search_class=EpornerSearch
+)
+
+_registry.register_site(
+    name="spankbang",
+    downloader_class=SpankBangDownloader,
+    search_class=SpankBangSearch
+)
+
+_registry.register_site(
+    name="xvideos",
+    downloader_class=XVideosDownloader,
+    search_class=XVideosSearch
 )
 
 __all__ = [
@@ -36,4 +47,8 @@ __all__ = [
     "PornHubSearch",
     "EpornerDownloader",
     "EpornerSearch",
+    "SpankBangDownloader",
+    "SpankBangSearch",
+    "XVideosDownloader",
+    "XVideosSearch",
 ]

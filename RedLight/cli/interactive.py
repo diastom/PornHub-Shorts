@@ -12,6 +12,86 @@ from ..multi_search import MultiSiteSearch
 from ..batch import BatchDownloader
 from ..playlist import PlaylistDownloader
 from ..search import PornHubSearch
+from ..api import GetVideoInfo
+
+
+def select_quality_interactive(url: str) -> str:
+    """
+    Fetch video information and let user select from actual available qualities.
+    
+    Args:
+        url: Video URL
+        
+    Returns:
+        Selected quality string (e.g., 'best', '720', 'worst')
+    """
+    try:
+        with console.status("[bold cyan]🔍 Fetching video information...", spinner="dots"):
+            info = GetVideoInfo(url)
+        
+        console.print(f"\n[bold green]✓ Video:[/] {info.get('title', 'Unknown')}")
+        
+        available_qualities = info.get('available_qualities', [])
+        
+        if not available_qualities:
+            console.print("[yellow]⚠ Could not detect available qualities, using default options[/]")
+            return _select_generic_quality()
+        
+        available_qualities = sorted(available_qualities, reverse=True)
+        
+        console.print("\n[bold yellow]📺 Select Quality:[/]")
+        quality_table = Table(show_header=False, box=box.SIMPLE)
+        quality_table.add_column("Option", style="cyan", width=12)
+        quality_table.add_column("Description", style="white")
+        
+        quality_table.add_row("1", f"🏆 Best Available ({available_qualities[0]}p)")
+        
+        quality_options = ["1"]
+        for idx, quality in enumerate(available_qualities, 2):
+            emoji = "📺" if quality >= 1080 else "📱" if quality >= 720 else "💾"
+            quality_table.add_row(str(idx), f"{emoji} {quality}p")
+            quality_options.append(str(idx))
+        
+        quality_table.add_row(str(len(available_qualities) + 2), f"📉 Lowest Available ({available_qualities[-1]}p)")
+        quality_options.append(str(len(available_qualities) + 2))
+        
+        console.print(quality_table)
+        
+        choice = Prompt.ask("   Your choice", choices=quality_options, default="1")
+        
+        if choice == "1":
+            return "best"
+        elif choice == str(len(available_qualities) + 2):
+            return "worst"
+        else:
+            quality_idx = int(choice) - 2
+            return str(available_qualities[quality_idx])
+            
+    except Exception as e:
+        console.print(f"[yellow]⚠ Error fetching video info: {str(e)}[/]")
+        console.print("[dim]Using default quality options...[/]\n")
+        return _select_generic_quality()
+
+
+def _select_generic_quality() -> str:
+    """Fallback to generic quality selection if video info fetch fails."""
+    console.print("\n[bold yellow]📺 Select Quality:[/]")
+    quality_table = Table(show_header=False, box=box.SIMPLE)
+    quality_table.add_column("Option", style="cyan", width=12)
+    quality_table.add_column("Description", style="white")
+    
+    quality_table.add_row("1", "🏆 Best Available (Recommended)")
+    quality_table.add_row("2", "📺 1080p")
+    quality_table.add_row("3", "📱 720p")
+    quality_table.add_row("4", "💾 480p")
+    quality_table.add_row("5", "📉 Lowest Available (Data Saver)")
+    
+    console.print(quality_table)
+    
+    q_choice = Prompt.ask("   Your choice", choices=["1", "2", "3", "4", "5"], default="1")
+    quality_map = {'1': 'best', '2': '1080', '3': '720', '4': '480', '5': 'worst'}
+    return quality_map[q_choice]
+
 
 def search_cli_mode(query, sort_by="mostviewed", duration=None):
     """Search from CLI with provided query (Moved from search.py)"""
@@ -74,23 +154,7 @@ def search_cli_mode(query, sort_by="mostviewed", duration=None):
                 console.print(f"\n[green]Selected:[/] {selected_video['title']}")
                 console.print(f"[dim]URL: {selected_video['url']}[/]\n")
                 
-                # Quality selection
-                console.print("[bold yellow]📺 Select Quality:[/]")
-                quality_table = Table(show_header=False, box=box.SIMPLE)
-                quality_table.add_column("Option", style="cyan", width=12)
-                quality_table.add_column("Description", style="white")
-                
-                quality_table.add_row("1", "🏆 Best Available (Recommended)")
-                quality_table.add_row("2", "📺 1080p")
-                quality_table.add_row("3", "📱 720p")
-                quality_table.add_row("4", "💾 480p")
-                quality_table.add_row("5", "📉 Lowest Available (Data Saver)")
-                
-                console.print(quality_table)
-                
-                q_choice = Prompt.ask("   Your choice", choices=["1", "2", "3", "4", "5"], default="1")
-                quality_map = {'1': 'best', '2': '1080', '3': '720', '4': '480', '5': 'worst'}
-                quality = quality_map[q_choice]
+                quality = select_quality_interactive(selected_video['url'])
                 
                 download_video(selected_video['url'], quality=quality)
                 
@@ -117,53 +181,30 @@ def interactive_mode():
         choice = Prompt.ask("\n   Select an option", choices=["1", "2", "3", "4", "5", "6", "7"], default="1")
         
         if choice == "1":
-            # Get URL
             url = Prompt.ask("\n[bold green]🔗 Enter Video URL[/]")
             if not url:
                 continue
             
-            # Quality Selection
-            console.print("\n[bold yellow]📺 Select Quality:[/]")
-            quality_table = Table(show_header=False, box=box.SIMPLE)
-            quality_table.add_column("Option", style="cyan", width=12)
-            quality_table.add_column("Description", style="white")
+            quality = select_quality_interactive(url)
             
-            quality_table.add_row("1", "🏆 Best Available (Recommended)")
-            quality_table.add_row("2", "📺 1080p")
-            quality_table.add_row("3", "📱 720p")
-            quality_table.add_row("4", "💾 480p")
-            quality_table.add_row("5", "📉 Lowest Available (Data Saver)")
-            
-            console.print(quality_table)
-            
-            q_choice = Prompt.ask("   Your choice", choices=["1", "2", "3", "4", "5"], default="1")
-            quality_map = {'1': 'best', '2': '1080', '3': '720', '4': '480', '5': 'worst'}
-            quality = quality_map[q_choice]
-            
-            # Proxy
             proxy = None
             if Confirm.ask("\n[bold yellow]🌐 Use Proxy?[/]", default=False):
                 proxy = Prompt.ask("   [cyan]Enter Proxy URL (e.g., http://127.0.0.1:2080)[/]")
                 if not proxy.startswith("http"):
                     proxy = f"http://{proxy}"
                     
-            # Custom Output
             output = None
             if Confirm.ask("\n[bold yellow]💾 Custom Output Filename?[/]", default=False):
                 output = Prompt.ask("   [cyan]Enter filename (e.g., video.mp4)[/]")
 
-            # Keep TS
             keep_ts = Confirm.ask("\n[bold yellow]📦 Keep original .ts file?[/]", default=False)
 
-            # Subtitles
             subs = Confirm.ask("\n[bold yellow]📝 Download Subtitles?[/]", default=False)
             
-            # Speed Limit
             speed_limit = None
             if Confirm.ask("\n[bold yellow]⚡ Limit download speed?[/]", default=False):
                 speed_limit = Prompt.ask("   [cyan]Enter speed limit (e.g., 1M, 500K)[/]")
             
-            # Start download
             download_video(url, output=output, quality=quality, proxy=proxy, keep_ts=keep_ts, subs=subs, speed_limit=speed_limit)
             
             if not Confirm.ask("\n[bold cyan]Do you want to continue?[/]", default=True):

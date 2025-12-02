@@ -109,25 +109,25 @@ class CustomHLSDownloader:
 
 
             streams = {}
+            shorties_id = self._extract_shorties_id(page_url)
             
-
-            media_def_match = re.search(r'mediaDefinitions\s*[:=]\s*(\[.+?\])', html_content)
-            if media_def_match:
+            all_media_defs = re.findall(r'mediaDefinitions["\']?\s*[:=]\s*(\[.+?\])', html_content)
+            
+            for media_def_match in all_media_defs:
                 try:
-                    json_str = media_def_match.group(1)
-                    # Simple cleanup if needed (though usually valid JSON in PH)
-                    definitions = json.loads(json_str)
+                    definitions = json.loads(media_def_match)
                     
                     for video in definitions:
                         if video.get('format') == 'hls' and video.get('videoUrl'):
                             video_url = video['videoUrl']
-                            if not video_url: continue
+                            if not video_url:
+                                continue
                             
-                            # Fix slashes
                             video_url = video_url.replace('\\/', '/')
                             
                             quality = video.get('quality')
-                            if isinstance(quality, list): quality = quality[0]
+                            if isinstance(quality, list):
+                                quality = quality[0]
                             
                             if quality:
                                 try:
@@ -136,12 +136,15 @@ class CustomHLSDownloader:
                                 except ValueError:
                                     streams[quality] = video_url
                             else:
-                                # Try to guess from URL
                                 q_match = re.search(r'(\d{3,4})[Pp]', video_url)
                                 if q_match:
                                     streams[int(q_match.group(1))] = video_url
                                 else:
                                     streams['unknown'] = video_url
+                    
+                    if streams:
+                        break
+                        
                 except Exception as e:
                     pass
 
@@ -185,6 +188,13 @@ class CustomHLSDownloader:
         if match:
             return match.group(1)
         return "unknown"
+    
+    def _extract_shorties_id(self, url: str) -> str:
+        """Extracts shorties ID from shorties URL."""
+        match = re.search(r'/shorties/([a-zA-Z0-9]+)', url)
+        if match:
+            return match.group(1)
+        return None
 
     def download_subtitles(self, html_content: str, output_base: Path) -> bool:
         """Attempts to find and download subtitles."""

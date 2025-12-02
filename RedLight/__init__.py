@@ -22,11 +22,11 @@ from .search import PornHubSearch
 # Async API (for bots and async applications)
 from .async_downloader import AsyncVideoDownloader
 
-# Multi-site support
 from .sites import SiteRegistry
 from .sites.pornhub import PornHubDownloader
 from .sites.eporner import EpornerDownloader, EpornerSearch
 from .sites.spankbang import SpankBangDownloader, SpankBangSearch
+from .sites.xvideos import XVideosDownloader, XVideosSearch
 from .multi_search import MultiSiteSearch
 
 from .version import __version__, __author__, __description__
@@ -52,11 +52,14 @@ __all__ = [
     "AsyncVideoDownloader",
     # Advanced
     "CustomHLSDownloader",
-    # Multi-site support
     "SiteRegistry",
     "EpornerDownloader",
     "EpornerSearch",
     "PornHubDownloader",
+    "SpankBangDownloader",
+    "SpankBangSearch",
+    "XVideosDownloader",
+    "XVideosSearch",
 ]
 
 

@@ -9,15 +9,15 @@ db = DatabaseManager()
 
 BANNER = """
 [bold cyan]╔══════════════════════════════════════════════════════════════════╗[/]
-[bold cyan]║[/]  [bold magenta]██████╗ ███████╗██████╗ ██╗     ██╗ ██████╗ ██╗  ██╗████████╗[/]  [bold cyan]║[/]
-[bold cyan]║[/]  [bold magenta]██╔══██╗██╔════╝██╔══██╗██║     ██║██╔════╝ ██║  ██║╚══██╔══╝[/]  [bold cyan]║[/]
-[bold cyan]║[/]  [bold magenta]██████╔╝█████╗  ██║  ██║██║     ██║██║  ███╗███████║   ██║   [/]  [bold cyan]║[/]
-[bold cyan]║[/]  [bold magenta]██╔══██╗██╔══╝  ██║  ██║██║     ██║██║   ██║██╔══██║   ██║   [/]  [bold cyan]║[/]
-[bold cyan]║[/]  [bold magenta]██║  ██║███████╗██████╔╝███████╗██║╚██████╔╝██║  ██║   ██║   [/]  [bold cyan]║[/]
-[bold cyan]║[/]  [bold magenta]╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   [/]  [bold cyan]║[/]
-[bold cyan]║[/]          [bold yellow]Professional Adult Content Downloader[/]              [bold cyan]║[/]
+[bold cyan]║[/]  [bold magenta]██████╗ ███████╗██████╗ ██╗     ██╗ ██████╗ ██╗  ██╗████████╗[/]   [bold cyan]║[/]
+[bold cyan]║[/]  [bold magenta]██╔══██╗██╔════╝██╔══██╗██║     ██║██╔════╝ ██║  ██║╚══██╔══╝[/]   [bold cyan]║[/]
+[bold cyan]║[/]  [bold magenta]██████╔╝█████╗  ██║  ██║██║     ██║██║  ███╗███████║   ██║   [/]   [bold cyan]║[/]
+[bold cyan]║[/]  [bold magenta]██╔══██╗██╔══╝  ██║  ██║██║     ██║██║   ██║██╔══██║   ██║   [/]   [bold cyan]║[/]
+[bold cyan]║[/]  [bold magenta]██║  ██║███████╗██████╔╝███████╗██║╚██████╔╝██║  ██║   ██║   [/]   [bold cyan]║[/]
+[bold cyan]║[/]  [bold magenta]╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   [/]   [bold cyan]║[/]
+[bold cyan]║[/]          [bold yellow]Professional Adult Content Downloader                [/]   [bold cyan]║[/]
 [bold cyan]╚══════════════════════════════════════════════════════════════════╝[/]
-                [dim]version 1.0.11 • RedLight DL[/]
+                [dim]version 1.0.13 • RedLight DL[/]
 """
 
 def show_banner():
