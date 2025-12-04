@@ -20,87 +20,65 @@
 
 ---
 
-this tool is made by AI in google **antigravity**
-
-## 🌐 Supported Sites
-
-- **PornHub** - HLS streaming downloads with full quality selection
-- **Eporner** - Direct MP4 downloads with aria2c support
-- **Spankbang** - Hybrid Delivery MP4/HLS with aria2c support
-- **XVideos** - Multi-quality MP4/HLS downloads with intelligent fallback
-
-More sites coming soon! The architecture is designed for easy integration of new platforms.
-
----
-
-## ✨ Features
-
-### 🎯 Core Features
-- **Multi-Site Support** - Download from multiple adult content sites
-- **Automatic Site Detection** - Just paste any supported URL
-- **Beautiful CLI** - Rich terminal UI with colors and progress bars
-- **Fast Downloads** - Multi-threaded segment downloading
-- **Quality Selection** - Choose from available qualities (1080p, 720p, 480p, etc.)
-- **Proxy Support** - Built-in HTTP/HTTPS proxy support
-- **Smart Naming** - Automatically extracts and sanitizes video titles
-- **Cross-platform** - Works on Windows, Linux, and macOS
-
-### 🆕 New in v1.0.9
-- 🌐 **Multi-Site Architecture** - Support for multiple adult content sites
-- 🔍 **Multi-Site Search** - Search across all sites or pick specific ones
-- 📊 **Search History** - Track your searches in database
-- ⚡ **Eporner Support** - Direct MP4 downloads with aria2c integration
-- 🔄 **Site Registry** - Easily extensible for adding new sites
-
-### 🎉 Features from v1.0.7
-- 📦 **Batch Downloads** - Download multiple videos concurrently or sequentially
-- 📺 **Playlist/Channel Support** - Download entire channels with one command
-- 🔍 **Advanced Search** - Search with filters (duration, sort by views/rating/date)
-- 🔄 **Format Conversion** - Convert to MP4/WebM/MKV, compress videos, extract audio
-- 📝 **Metadata Editor** - Edit video tags and thumbnails (API)
-- 🛠️ **Enhanced API** - Comprehensive Python library for automation
-
-### 🔧 Developer Features
-- **Programmable API** - Use as a Python library to build custom scripts and bots
-- **Async Support** - Perfect for Telegram/Discord bot integration
-- **Type Hints** - Full type hinting for better IDE support
-- **Progress Callbacks** - Track download progress in your applications
-
-
 ## 📦 Installation
 
-### Method 1: From PyPI ✅ (Recommended)
+### From PyPI ✅ (Recommended)
 
 ```bash
 pip install ph-shorts
 ```
 
-### Method 2: Quick Install (Linux/macOS)
+### Quick Install (Linux/macOS)
 
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
 
-### Method 3: Quick Install (Windows)
+### Quick Install (Windows)
 
 ```batch
 install.bat
 ```
 
-### Method 4: Manual Install with pip
+### Manual Install from Source
 
 ```bash
-# Clone or download the repository
+# Clone the repository
 git clone https://github.com/diastom/RedLightDL.git
 cd RedLightDL
 
-# Install using pip
+# Install
 pip install .
-
-# Or install in development mode
-pip install -e .
 ```
+
+---
+
+## 🌐 Supported Sites
+
+- **PornHub** - HLS streaming downloads with full quality selection
+- **Eporner** - Direct MP4 downloads with aria2c support
+- **Spankbang** - Hybrid Delivery MP4/HLS with aria2c support (4K!)
+- **XVideos** - Multi-quality MP4/HLS downloads with intelligent fallback
+
+---
+
+## ✨ Features
+
+- **Multi-Site Support** - Download from 4 adult content sites
+- **Automatic Site Detection** - Just paste any supported URL
+- **Beautiful CLI** - Rich terminal UI with colors and progress bars
+- **Fast Downloads** - Multi-threaded segment downloading
+- **Quality Selection** - Choose from available qualities (up to 4K!)
+- **Batch Downloads** - Download multiple videos concurrently
+- **Playlist/Channel Support** - Download entire channels
+- **Advanced Search** - Search across all sites or specific ones
+- **Format Conversion** - Convert to MP4/WebM/MKV, compress videos
+- **Proxy Support** - Built-in HTTP/HTTPS proxy support
+- **Python API** - Use as a library for automation
+- **Async Support** - Perfect for bot integration
+
+---
 
 ## 🚀 Usage
 
@@ -124,139 +102,101 @@ You'll get a beautiful interactive menu:
 ║  ╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝     ║
 ║          Professional Adult Content Downloader                  ║
 ╚══════════════════════════════════════════════════════════════════╝
-                    version 1.0.8 • RedLight DL
+                    version 1.0.13 • RedLight DL
 ```
 
 
-### Command Line Mode (For power users)
+### Command Line Mode
 
 ```bash
-ph-shorts "VIDEO_URL" [OPTIONS]
-```
+# Download from any supported site
+ph-shorts "VIDEO_URL"
 
-## 📝 Examples
-
-### v1.0.7 New Features
-
-#### Batch Download
-```bash
-# Download multiple videos concurrently
-ph-shorts --batch "url1, url2, url3" --concurrent
-
-# Download sequentially (more stable)
-ph-shorts --batch "url1, url2, url3"
-```
-
-#### Channel/Playlist Download
-```bash
-# Download entire channel (limit 10 videos)
-ph-shorts --channel "pornhub_user" --limit 10
-
-# Download with concurrent mode
-ph-shorts --channel "https://www.pornhub.com/model/username" --limit 5 --concurrent
-```
-
-#### Advanced Search
-```bash
-# Search and filter
-ph-shorts --search "query" --sort mostviewed --duration short
-
-# Sort options: mostviewed, toprated, newest
-# Duration: short (<10m), medium (10-20m), long (>20m)
-```
-
-#### Format Conversion
-```bash
-# Convert to WebM
-ph-shorts "URL" --format webm
-
-# Compress video (quality 0-100)
-ph-shorts "URL" --compress 70
-
-# Extract audio only (MP3)
-ph-shorts "URL" --audio-only
-
-# Combine options
-ph-shorts "URL" --format mkv --compress 80
-```
-
-### Basic Examples
-
-### Basic download (best quality)
-```bash
-ph-shorts "https://www.pornhub.com/view_video.php?viewkey=..."
-```
-
-### Specify quality
-```bash
+# Specify quality
 ph-shorts "URL" -q 720
-```
 
-### Custom output filename
-```bash
+# Custom output
 ph-shorts "URL" -o my_video.mp4
-```
 
-### Use a proxy
-```bash
+# Use proxy
 ph-shorts "URL" -p http://127.0.0.1:1080
 ```
 
-### Keep original .ts file
-```bash
-ph-shorts "URL" --keep-ts
-```
-```
+---
 
-### Async Support (for Bots)
+## 📝 Examples
 
-Perfect for Telegram bots, Discord bots, and other async applications:
+### Basic Download (Works with ANY Site!)
 
 ```python
-from RedLight import AsyncVideoDownloader
+from RedLight import DownloadVideo
 
-async def download_for_bot(url: str):
-    async with AsyncVideoDownloader() as downloader:
-        # Get info first
-        info = await downloader.get_info(url)
-        print(f"Downloading: {info['title']}")
-        
-        # Download video
-        video_path = await downloader.download(url)
-        return video_path
+# PornHub
+DownloadVideo("https://www.pornhub.com/view_video.php?viewkey=xxxxx")
+
+# Eporner (ultra-fast with aria2c!)
+DownloadVideo("https://www.eporner.com/video-xxxxx/title")
+
+# Spankbang (4K support!)
+DownloadVideo("https://spankbang.com/xxxxx/video/title")
+
+# XVideos
+DownloadVideo("https://www.xvideos.com/video.xxxxx/title")
+```
+
+### Batch Download from Multiple Sites
+
+```python
+from RedLight import BatchDownloader
+
+urls = [
+    "https://www.pornhub.com/view_video.php?viewkey=xxxxx",
+    "https://www.eporner.com/video-xxxxx/title",
+    "https://spankbang.com/xxxxx/video/title"
+]
+
+downloader = BatchDownloader(concurrent=True, max_workers=3)
+downloader.AddUrls(urls)
+results = downloader.DownloadAll()
+```
+
+### Multi-Site Search
+
+```python
+from RedLight import MultiSiteSearch, DownloadVideo
+
+# Search across all sites
+searcher = MultiSiteSearch()
+results = searcher.search_all("your search term")
+
+print(f"Found {len(results)} videos across all sites")
+
+# Download top result from each site
+for video in results[:4]:
+    DownloadVideo(video['url'])
 ```
 
 ### More Examples
 
 Check the [`examples/`](examples/) directory for complete working examples:
-- [`basic_usage.py`](examples/basic_usage.py) - Simple download
-- [`progress_tracking.py`](examples/progress_tracking.py) - Progress bar
-- [`telegram_bot.py`](examples/telegram_bot.py) - Telegram bot integration
-- [`batch_download.py`](examples/batch_download.py) - Batch downloads
+- [`basic_usage.py`](examples/basic_usage.py) - Multi-site basics
+- [`multi_site_search.py`](examples/multi_site_search.py) - Search all sites
+- [`multi_site_download.py`](examples/multi_site_download.py) - Batch downloads
+- [`site_specific_features.py`](examples/site_specific_features.py) - Site features
 
-## ⚙️ Options
+---
 
-```
-Usage: ph-shorts [URL] [OPTIONS]
+## 📚 Documentation
 
-Arguments:
-  URL                   Video URL (optional - will prompt if not provided)
+Complete documentation available in [`docs/`](docs/):
 
-Options:
-  -o, --output TEXT     Custom output filename
-  -q, --quality TEXT    Quality: best, worst, 1080, 720, 480 (default: best)
-  -p, --proxy TEXT      HTTP/HTTPS proxy URL
-  --keep-ts             Keep original .ts file (don't convert to mp4)
-  --help                Show this message and exit
-```
+- **[Quick Start Guide](docs/QuickStart.md)** - Get started in 5 minutes
+- **[Multi-Site Guide](docs/MultiSite.md)** - Complete multi-site guide
+- **[API Reference](docs/API.md)** - Function documentation
+- **[Examples](docs/Examples.md)** - Code examples
+- **[Advanced Usage](docs/Advanced.md)** - Advanced topics
 
-### Quality Options
-
-- `best` - Highest available quality (default)
-- `worst` - Lowest available quality (saves bandwidth)
-- `1080` - 1080p (if available)
-- `720` - 720p (if available)
-- `480` - 480p (if available)
+---
 
 ## 🔧 Requirements
 
@@ -266,28 +206,11 @@ Options:
 
 ### Optional (Recommended)
 - **FFmpeg** - For automatic MP4 conversion
-  - Without FFmpeg, videos are saved as `.ts` files
-  - Install:
-    - **Ubuntu/Debian**: `sudo apt install ffmpeg`
-    - **macOS**: `brew install ffmpeg`
-    - **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html)
+  - **Ubuntu/Debian**: `sudo apt install ffmpeg`
+  - **macOS**: `brew install ffmpeg`
+  - **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html)
 
-## 🐛 Troubleshooting
-
-### Issue: "403 Forbidden" error
-**Solution**: The site might be blocking requests. Try using a different User-Agent or proxy.
-
-### Issue: Videos saved as .ts instead of .mp4
-**Solution**: Install FFmpeg for automatic conversion.
-
-### Issue: Slow download speed
-**Solution**: 
-- Check your internet connection
-- Try using a proxy closer to the server location
-- The quality you selected might be from a slower CDN
-
-### Issue: "No compatible HLS stream found"
-**Solution**: The video URL might be invalid or the video format is not supported.
+---
 
 ## 🤝 Contributing
 
@@ -296,33 +219,26 @@ Contributions are welcome! Feel free to:
 - Suggest new features
 - Submit pull requests
 
+---
+
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
 
 ## ⚖️ Disclaimer
 
 This tool is for educational purposes only. Please respect copyright laws and the terms of service of the websites you download from. The developers are not responsible for any misuse of this software.
 
-## 🙏 Credits
-
-Built with:
-- [Rich](https://github.com/Textualize/rich) - Beautiful terminal formatting
-- [Click](https://github.com/pallets/click) - CLI framework
-- [Requests](https://github.com/psf/requests) - HTTP library
-
-## 📧 Support
-
-If you encounter any issues or have questions:
-- Open an issue on GitHub
-- Check existing issues for solutions
-
 ---
 
 <div align="center">
 
-**Made with ❤️ for the community**
+**Made with ❤️ by AI (Google Antigravity)**
 
 If this tool helped you, consider giving it a ⭐ on GitHub!
+
+[GitHub](https://github.com/diastom/RedLightDL) • [PyPI](https://pypi.org/project/ph-shorts/) • [Documentation](docs/)
 
 </div>
