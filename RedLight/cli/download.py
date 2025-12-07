@@ -1,7 +1,11 @@
 import sys
 import shutil
+import time
 from pathlib import Path
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeRemainingColumn
+from rich.progress import (
+    Progress, SpinnerColumn, BarColumn, TextColumn, 
+    TimeRemainingColumn, DownloadColumn, TransferSpeedColumn
+)
 from rich.panel import Panel
 from rich import box
 import traceback
@@ -9,6 +13,9 @@ from .ui import console, db
 from ..sites import SiteRegistry
 from ..api import GetVideoInfo, DownloadVideo
 from ..converter import VideoConverter
+from ..config import GetConfig
+from ..notifications import GetNotifier
+
 
 def process_video_conversion(video_path, format=None, compress=None, audio_only=False, keep_ts=False, console=None):
     """
@@ -64,12 +71,37 @@ def process_video_conversion(video_path, format=None, compress=None, audio_only=
         console.print(f"  [red]Conversion failed: {e}[/]")
         return video_path
 
-def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, subs=False, speed_limit=None):
 
-    """Download a video with fancy progress bars using multi-site API"""
+def download_video(url, output=None, quality=None, proxy=None, keep_ts=False, subs=False, speed_limit=None):
+    """
+    Download a video with fancy progress bars using multi-site API.
+    
+    Features:
+    - Config-based defaults for quality, output directory, proxy
+    - Enhanced progress bar with speed and ETA display
+    - Aria2c support for faster downloads
+    - Notifications on completion
+    """
     
     try:
-
+        # Load config for defaults
+        config = GetConfig()
+        
+        # Apply config defaults
+        if quality is None:
+            quality = config.download.default_quality
+        
+        if proxy is None:
+            proxies = config.proxy.get_proxies()
+            if proxies:
+                proxy = proxies.get('http') or proxies.get('https')
+        
+        if speed_limit is None and config.download.speed_limit:
+            speed_limit = config.download.speed_limit
+        
+        output_dir = config.download.output_directory
+        show_speed = config.ui.show_speed
+        show_eta = config.ui.show_eta
         
         # Phase 1: Get video info and display
         with console.status("[bold cyan]🔍 Detecting site and fetching video information...", spinner="dots"):
@@ -77,7 +109,7 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
             site_name = registry.detect_site(url)
             
             if not site_name:
-                raise ValueError("Unsupported URL. Please use a PornHub or Eporner link.")
+                raise ValueError("Unsupported URL. Please use a PornHub, Eporner, SpankBang, or XVideos link.")
             
             # Get video info
             info = GetVideoInfo(url)
@@ -105,17 +137,16 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
         if proxy:
             console.print(f"[green]✓[/] Proxy: [bold]{proxy}[/]")
         
-        # Phase 2: Download with progress tracking
-        console.print("\n[bold cyan]📥 Downloading...[/]")
-        output_dir = "./downloads"
+        if speed_limit:
+            console.print(f"[green]✓[/] Speed Limit: [bold]{speed_limit}[/]")
+        
+        # Phase 2: Download
+        console.print("\n[bold cyan]📥 Starting download...[/]")
         
         # For Eporner, disable aria2c to get progress feedback
         # We'll use the Python multi-threaded downloader
         if site_name == "eporner":
             # Temporarily disable aria2c for better progress tracking
-            aria2c_path = shutil.which("aria2c")
-            
-            # Monkey-patch to disable aria2c
             original_which = shutil.which
             def mock_which(cmd):
                 if cmd == "aria2c":
@@ -124,26 +155,29 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
             
             shutil.which = mock_which
         
+        # Progress tracking with speed and ETA
+        start_time = time.time()
+        last_update = [0]
+        last_time = [start_time]
+        current_speed = [0.0]
+        
         try:
+            # Simple progress bar for HLS (shows segments, not bytes)
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
                 BarColumn(complete_style="cyan", finished_style="green"),
                 TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                TimeRemainingColumn(),
+                TextColumn("[cyan]{task.completed}/{task.total} segments[/]"),
                 console=console
             ) as progress:
                 
-                # Progress tracking
                 task_id = None
                 
                 def on_progress(current, total):
                     nonlocal task_id
                     if task_id is None:
-                        task_id = progress.add_task(
-                            f"[cyan]Downloading {selected_q}p...", 
-                            total=total
-                        )
+                        task_id = progress.add_task(f"[cyan]Downloading {selected_q}p", total=total)
                     progress.update(task_id, completed=current)
                 
                 # Download using the multi-site API with progress callback
@@ -161,6 +195,27 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
             if site_name == "eporner":
                 shutil.which = original_which
         
+        # Calculate download time and average speed
+        total_time = time.time() - start_time
+        file_size = Path(result_path).stat().st_size if Path(result_path).exists() else 0
+        avg_speed = file_size / total_time if total_time > 0 else 0
+        
+        # Format speed for display
+        def format_speed(bps):
+            for unit in ['B/s', 'KB/s', 'MB/s', 'GB/s']:
+                if bps < 1024:
+                    return f"{bps:.1f} {unit}"
+                bps /= 1024
+            return f"{bps:.1f} TB/s"
+        
+        # Format size for display
+        def format_size(size):
+            for unit in ['B', 'KB', 'MB', 'GB']:
+                if size < 1024:
+                    return f"{size:.1f} {unit}"
+                size /= 1024
+            return f"{size:.1f} TB"
+        
         # Success message
         console.print()
         success_panel = Panel(
@@ -168,6 +223,9 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
             f"[cyan]Site:[/] [bold white]{site_name.title()}[/]\n"
             f"[cyan]Title:[/] [bold white]{info['title']}[/]\n"
             f"[cyan]Quality:[/] [bold white]{selected_q}p[/]\n"
+            f"[cyan]Size:[/] [bold white]{format_size(file_size)}[/]\n"
+            f"[cyan]Time:[/] [bold white]{total_time:.1f}s[/]\n"
+            f"[cyan]Speed:[/] [bold white]{format_speed(avg_speed)}[/]\n"
             f"[cyan]File:[/] [bold white]{Path(result_path).name}[/]\n"
             f"[cyan]Location:[/] [dim]{Path(result_path).absolute()}[/]",
             title="[bold green]Success[/]",
@@ -176,8 +234,27 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
         )
         console.print(success_panel)
         
-        # Save to history
-        db.add_entry(url, info['title'], result_path, selected_q)
+        # Save to history with file size
+        db.add_entry(
+            url=url,
+            title=info['title'],
+            filename=result_path,
+            quality=selected_q,
+            site=site_name,
+            file_size=file_size
+        )
+        
+        # Send notification if enabled
+        if config.notifications.enabled and config.notifications.on_complete:
+            try:
+                GetNotifier().notify_download_complete(
+                    title=info['title'],
+                    filename=Path(result_path).name,
+                    path=str(result_path),
+                    quality=str(selected_q)
+                )
+            except Exception:
+                pass
         
         return result_path
         
@@ -186,6 +263,19 @@ def download_video(url, output=None, quality='best', proxy=None, keep_ts=False, 
         sys.exit(0)
     except Exception as e:
         console.print(f"\n[bold red]✗ Error:[/] {str(e)}")
-
+        
+        # Send error notification if enabled
+        try:
+            config = GetConfig()
+            if config.notifications.enabled and config.notifications.on_error:
+                GetNotifier().notify_download_failed(
+                    title="Download Failed",
+                    url=url,
+                    error=str(e)
+                )
+        except Exception:
+            pass
+        
         console.print(f"[dim]{traceback.format_exc()}[/]")
         sys.exit(1)
+

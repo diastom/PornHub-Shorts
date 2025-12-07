@@ -13,6 +13,11 @@ from ..batch import BatchDownloader
 from ..playlist import PlaylistDownloader
 from ..search import PornHubSearch
 from ..api import GetVideoInfo
+from ..statistics import GetStatistics
+from ..resume_manager import GetResumeManager
+from ..notifications import GetNotifier
+from ..config import GetConfig, SaveConfig, CreateDefaultConfig, ResetConfig, ConfigManager
+from ..aria2_downloader import IsAria2cAvailable
 
 
 def select_quality_interactive(url: str) -> str:
@@ -176,9 +181,11 @@ def interactive_mode():
         console.print("4. [bold yellow]Download Channel/Playlist[/]")
         console.print("5. [bold magenta]View History[/]")
         console.print("6. [bold white]View Statistics[/]")
-        console.print("7. [bold red]Exit[/]")
+        console.print("7. [bold cyan]Active Downloads[/]")
+        console.print("8. [bold dark_orange]Settings[/]")
+        console.print("9. [bold red]Exit[/]")
         
-        choice = Prompt.ask("\n   Select an option", choices=["1", "2", "3", "4", "5", "6", "7"], default="1")
+        choice = Prompt.ask("\n   Select an option", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9"], default="1")
         
         if choice == "1":
             url = Prompt.ask("\n[bold green]🔗 Enter Video URL[/]")
@@ -321,14 +328,22 @@ def interactive_mode():
             channel_download_interactive()
             
         elif choice == "5":
-            db.show_history(console)
-            Prompt.ask("\n[dim]Press Enter to return to menu...[/]")
+            # Enhanced History Menu
+            history_menu_interactive()
             
         elif choice == "6":
-            db.show_stats(console)
-            Prompt.ask("\n[dim]Press Enter to return to menu...[/]")
+            # Enhanced Statistics Menu
+            statistics_menu_interactive()
             
         elif choice == "7":
+            # Active Downloads (Resume/Pause)
+            active_downloads_menu()
+        
+        elif choice == "8":
+            # Settings Menu
+            settings_menu_interactive()
+            
+        elif choice == "9":
             console.print("[bold green]Goodbye! 👋[/]")
             break
 
@@ -529,3 +544,328 @@ def channel_download_interactive():
     
     console.print(f"\n[bold green]✅ Channel Download Complete![/]")
     Prompt.ask("\n[dim]Press Enter to return to menu...[/]")
+
+
+def history_menu_interactive():
+    """Enhanced history menu with export and management options."""
+    while True:
+        console.print("\n[bold magenta]📜 Download History Menu[/]")
+        console.print("1. [bold]View Recent History[/]")
+        console.print("2. [bold]View History by Site[/]")
+        console.print("3. [bold]Export History (JSON)[/]")
+        console.print("4. [bold]Export History (CSV)[/]")
+        console.print("5. [bold red]Clear History[/]")
+        console.print("6. [bold]Back to Main Menu[/]")
+        
+        choice = Prompt.ask("   Select option", choices=["1", "2", "3", "4", "5", "6"], default="1")
+        
+        if choice == "1":
+            limit = int(Prompt.ask("   [cyan]How many entries to show?[/]", default="20"))
+            db.show_history(console, limit=limit)
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "2":
+            console.print("\n[cyan]Select site:[/]")
+            console.print("1. PornHub")
+            console.print("2. Eporner")
+            console.print("3. SpankBang")
+            console.print("4. XVideos")
+            
+            site_choice = Prompt.ask("   Site", choices=["1", "2", "3", "4"], default="1")
+            site_map = {"1": "pornhub", "2": "eporner", "3": "spankbang", "4": "xvideos"}
+            db.show_history(console, limit=20, site=site_map[site_choice])
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "3":
+            filepath = Prompt.ask("   [cyan]Export path[/]", default="./history.json")
+            try:
+                result = db.export_history(format="json", filepath=filepath)
+                console.print(f"[green]✓ Exported to {result}[/]")
+            except Exception as e:
+                console.print(f"[red]✗ Export failed: {e}[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "4":
+            filepath = Prompt.ask("   [cyan]Export path[/]", default="./history.csv")
+            try:
+                result = db.export_history(format="csv", filepath=filepath)
+                console.print(f"[green]✓ Exported to {result}[/]")
+            except Exception as e:
+                console.print(f"[red]✗ Export failed: {e}[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "5":
+            if Confirm.ask("[bold red]⚠ Clear ALL download history?[/]", default=False):
+                deleted = db.clear_history()
+                console.print(f"[green]✓ Deleted {deleted} entries[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "6":
+            break
+
+
+def statistics_menu_interactive():
+    """Enhanced statistics menu with detailed views."""
+    stats = GetStatistics()
+    
+    while True:
+        console.print("\n[bold white]📊 Statistics Menu[/]")
+        console.print("1. [bold]View Dashboard[/]")
+        console.print("2. [bold]Site Breakdown[/]")
+        console.print("3. [bold]Quality Distribution[/]")
+        console.print("4. [bold]Download Timeline[/]")
+        console.print("5. [bold]Search Statistics[/]")
+        console.print("6. [bold]Back to Main Menu[/]")
+        
+        choice = Prompt.ask("   Select option", choices=["1", "2", "3", "4", "5", "6"], default="1")
+        
+        if choice == "1":
+            stats.show_dashboard(console)
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "2":
+            stats.show_site_breakdown(console)
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "3":
+            stats.show_quality_distribution(console)
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "4":
+            days = int(Prompt.ask("   [cyan]Show last N days[/]", default="7"))
+            stats.show_timeline(console, days=days)
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "5":
+            stats.show_search_stats(console)
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "6":
+            break
+
+
+def active_downloads_menu():
+    """Menu to manage active and paused downloads (Resume/Pause)."""
+    manager = GetResumeManager()
+    
+    while True:
+        console.print("\n[bold cyan]⏯️ Active Downloads Manager[/]")
+        
+        # Get downloads
+        active = manager.list_active_downloads()
+        paused = manager.list_paused_downloads()
+        failed = manager.list_failed_downloads()
+        
+        if not active and not paused and not failed:
+            console.print("[yellow]No active, paused, or failed downloads.[/]")
+            console.print("[dim]Downloads here are managed for resume/pause capability.[/]")
+            Prompt.ask("\n[dim]Press Enter to return...[/]")
+            break
+        
+        # Show active downloads
+        if active:
+            console.print("\n[bold green]📥 Active Downloads:[/]")
+            for i, d in enumerate(active, 1):
+                progress = (d.downloaded_size / d.total_size * 100) if d.total_size > 0 else 0
+                console.print(f"  {i}. [cyan]{d.download_id}[/] - {d.title[:40]} ({progress:.1f}%)")
+        
+        # Show paused downloads
+        if paused:
+            console.print("\n[bold yellow]⏸️ Paused Downloads:[/]")
+            for i, d in enumerate(paused, 1):
+                progress = (d.downloaded_size / d.total_size * 100) if d.total_size > 0 else 0
+                console.print(f"  {i}. [cyan]{d.download_id}[/] - {d.title[:40]} ({progress:.1f}%)")
+        
+        # Show failed downloads
+        if failed:
+            console.print("\n[bold red]❌ Failed Downloads (Resumable):[/]")
+            for i, d in enumerate(failed, 1):
+                console.print(f"  {i}. [cyan]{d.download_id}[/] - {d.title[:40]}")
+        
+        console.print("\n[bold]Options:[/]")
+        console.print("1. [green]Resume a paused/failed download[/]")
+        console.print("2. [yellow]Pause an active download[/]")
+        console.print("3. [red]Cancel a download[/]")
+        console.print("4. [dim]Clean up completed[/]")
+        console.print("5. [bold]Back to Main Menu[/]")
+        
+        choice = Prompt.ask("   Select option", choices=["1", "2", "3", "4", "5"], default="5")
+        
+        if choice == "1":
+            download_id = Prompt.ask("   [cyan]Enter Download ID to resume[/]")
+            state = manager.resume_download(download_id)
+            if state:
+                console.print(f"[green]✓ Resumed: {state.title}[/]")
+                console.print("[dim]Note: You need to restart the download process to continue.[/]")
+            else:
+                console.print("[red]✗ Could not resume. Download not found or not resumable.[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "2":
+            download_id = Prompt.ask("   [cyan]Enter Download ID to pause[/]")
+            if manager.pause_download(download_id):
+                console.print(f"[green]✓ Paused: {download_id}[/]")
+            else:
+                console.print("[red]✗ Could not pause. Download not found or not active.[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "3":
+            download_id = Prompt.ask("   [cyan]Enter Download ID to cancel[/]")
+            if Confirm.ask(f"[red]Cancel download {download_id}?[/]", default=False):
+                if manager.cancel_download(download_id):
+                    console.print(f"[green]✓ Cancelled: {download_id}[/]")
+                else:
+                    console.print("[red]✗ Could not cancel.[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "4":
+            cleaned = manager.cleanup_all_completed()
+            console.print(f"[green]✓ Cleaned up {cleaned} completed/cancelled downloads[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "5":
+            break
+
+
+def settings_menu_interactive():
+    """Settings menu for notifications, config, and other preferences."""
+    notifier = GetNotifier()
+    config = GetConfig()
+    
+    while True:
+        console.print("\n[bold dark_orange]⚙️ Settings[/]")
+        
+        # Show current settings
+        notif_status = "[green]Enabled[/]" if notifier.config.enabled else "[red]Disabled[/]"
+        sound_status = "[green]Enabled[/]" if notifier.config.sound_enabled else "[red]Disabled[/]"
+        aria2c_status = "[green]Available[/]" if IsAria2cAvailable() else "[yellow]Not installed[/]"
+        
+        console.print(f"\n[bold]Current Settings:[/]")
+        console.print(f"  Default Quality: [cyan]{config.download.default_quality}[/]")
+        console.print(f"  Output Directory: [cyan]{config.download.output_directory}[/]")
+        console.print(f"  Aria2c: {aria2c_status} ({'Enabled' if config.download.use_aria2c else 'Disabled'})")
+        console.print(f"  Notifications: {notif_status}")
+        console.print(f"  Notification Sounds: {sound_status}")
+        
+        if config.proxy.enabled:
+            console.print(f"  Proxy: [cyan]{config.proxy.http or config.proxy.https}[/]")
+        
+        console.print("\n[bold]Options:[/]")
+        console.print("1. [bold]Set Default Quality[/]")
+        console.print("2. [bold]Set Download Directory[/]")
+        console.print("3. [bold]Configure Proxy[/]")
+        console.print("4. [bold]Toggle Aria2c (Fast Downloads)[/]")
+        console.print("5. [bold]Toggle Notifications[/]")
+        console.print("6. [bold]Toggle Notification Sounds[/]")
+        console.print("7. [bold]Test Notification[/]")
+        console.print("8. [bold]Open Config File[/]")
+        console.print("9. [bold]Reset to Defaults[/]")
+        console.print("10. [bold]View App Info[/]")
+        console.print("11. [bold]Back to Main Menu[/]")
+        
+        choice = Prompt.ask("   Select option", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"], default="11")
+        
+        if choice == "1":
+            console.print("\n[cyan]Quality Options:[/]")
+            console.print("  best, worst, 1080, 720, 480, 360, 240")
+            new_quality = Prompt.ask("   [cyan]Default quality[/]", default=config.download.default_quality)
+            config.download.default_quality = new_quality
+            save_config(config)
+            console.print(f"[green]✓ Default quality set to: {new_quality}[/]")
+            
+        elif choice == "2":
+            new_dir = Prompt.ask("   [cyan]Download directory[/]", default=config.download.output_directory)
+            config.download.output_directory = new_dir
+            SaveConfig(config)
+            console.print(f"[green]✓ Download directory set to: {new_dir}[/]")
+            
+        elif choice == "3":
+            console.print("\n[bold cyan]Proxy Configuration[/]")
+            enable_proxy = Confirm.ask("   Enable proxy?", default=config.proxy.enabled)
+            config.proxy.enabled = enable_proxy
+            
+            if enable_proxy:
+                proxy_url = Prompt.ask("   [cyan]Proxy URL (e.g., http://127.0.0.1:8080)[/]", 
+                                       default=config.proxy.http or "")
+                config.proxy.http = proxy_url
+                config.proxy.https = proxy_url
+            
+            save_config(config)
+            console.print(f"[green]✓ Proxy settings saved[/]")
+            
+        elif choice == "4":
+            if IsAria2cAvailable():
+                config.download.use_aria2c = not config.download.use_aria2c
+                save_config(config)
+                status = "enabled" if config.download.use_aria2c else "disabled"
+                console.print(f"[green]✓ Aria2c {status}[/]")
+                
+                if config.download.use_aria2c:
+                    connections = Prompt.ask("   [cyan]Number of connections[/]", 
+                                            default=str(config.download.aria2c_connections))
+                    try:
+                        config.download.aria2c_connections = int(connections)
+                        save_config(config)
+                    except ValueError:
+                        pass
+            else:
+                console.print("[yellow]Aria2c is not installed. Install it for faster downloads.[/]")
+                console.print("[dim]  Windows: choco install aria2 or scoop install aria2[/]")
+                console.print("[dim]  Linux: sudo apt install aria2[/]")
+                console.print("[dim]  macOS: brew install aria2[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "5":
+            if notifier.config.enabled:
+                notifier.disable()
+                console.print("[yellow]✓ Notifications disabled[/]")
+            else:
+                notifier.enable()
+                console.print("[green]✓ Notifications enabled[/]")
+            
+        elif choice == "6":
+            if notifier.config.sound_enabled:
+                notifier.disable_sound()
+                console.print("[yellow]✓ Notification sounds disabled[/]")
+            else:
+                notifier.enable_sound()
+                console.print("[green]✓ Notification sounds enabled[/]")
+            
+        elif choice == "7":
+            console.print("[cyan]Sending test notification...[/]")
+            notifier.notify_custom(
+                "🔔 Test Notification",
+                "RedLight DL notifications are working!",
+                "success"
+            )
+            console.print("[green]✓ Test notification sent![/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "8":
+            config_path = ConfigManager.DEFAULT_CONFIG_PATH
+            CreateDefaultConfig()  # Ensure it exists
+            console.print(f"\n[bold]Config File Location:[/]")
+            console.print(f"  [cyan]{config_path}[/]")
+            console.print("\n[dim]Edit this file directly for advanced settings.[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "9":
+            if Confirm.ask("[bold red]Reset all settings to defaults?[/]", default=False):
+                ResetConfig()
+                config = GetConfig()  # Reload
+                console.print("[green]✓ Settings reset to defaults[/]")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "10":
+            from ..version import __version__, __author__, __description__
+            console.print(f"\n[bold cyan]RedLight DL v{__version__}[/]")
+            console.print(f"[dim]{__description__}[/]")
+            console.print(f"[dim]By: {__author__}[/]")
+            console.print(f"\n[bold]Supported Sites:[/] PornHub, Eporner, SpankBang, XVideos")
+            console.print(f"[bold]Config File:[/] ~/.RedLight/config.yaml")
+            console.print(f"[bold]Database:[/] ~/.RedLight/history.db")
+            console.print(f"[bold]Downloads DB:[/] ~/.RedLight/downloads.db")
+            Prompt.ask("\n[dim]Press Enter to continue...[/]")
+            
+        elif choice == "11":
+            break

@@ -1,5 +1,130 @@
 ﻿# Release Notes - RedLight DL
 
+## Version 1.0.14 (2025-12-07)
+
+### 🎉 Major New Features
+
+#### ⏯️ Resume/Pause Downloads
+- **Pausable Downloads**: Pause active downloads and resume them later
+- **Resume Manager**: New `ResumeManager` class with persistent state in SQLite
+- **API Functions**:
+  - `StartResumableDownload()` - Start a download and get a download ID
+  - `PauseDownload()` - Pause an active download
+  - `ResumeDownload()` - Resume a paused download
+  - `CancelDownload()` - Cancel and remove download state
+  - `GetActiveDownloads()` - List currently downloading items
+  - `GetPausedDownloads()` - List paused downloads
+
+#### 📜 Enhanced Download History
+- **Extended Metadata**: Now tracks site, file size, duration, and status
+- **Filter by Site**: View history filtered by specific site
+- **Export Support**: Export history to JSON or CSV
+- **Clear History**: Clear all or old entries
+- **API Functions**:
+  - `GetDownloadHistory()` - Get history with optional filters
+  - `ClearDownloadHistory()` - Clear history entries
+  - `ExportHistory()` - Export to JSON/CSV
+
+#### 🔔 Desktop Notifications
+- **Cross-Platform**: Supports Windows, macOS, and Linux
+- **Sound Alerts**: Optional notification sounds
+- **Customizable**: Enable/disable notifications and sounds
+- **API Functions**:
+  - `EnableNotifications()` - Toggle notifications on/off
+  - `SetNotificationSound()` - Custom notification sound
+  - `SendNotification()` - Send custom notifications
+
+#### 📊 Advanced Statistics
+- **Statistics Dashboard**: Comprehensive view of all download stats
+- **Per-Site Breakdown**: Downloads, size, and quality per site
+- **Quality Distribution**: Visual breakdown of quality choices
+- **Download Timeline**: Daily download counts chart
+- **Search Statistics**: Most searched queries
+- **API Functions**:
+  - `GetStatistics()` - Get summary statistics
+  - `GetStatsBySite()` - Stats grouped by site
+  - `GetStatsByQuality()` - Stats grouped by quality
+  - `GetStatsByDate()` - Daily download counts
+
+#### ⚙️ Configuration File (NEW)
+- **YAML-Based Config**: `~/.RedLight/config.yaml` for persistent settings
+- **Default Quality**: Set default quality (best, 1080, 720, etc.)
+- **Download Directory**: Configure default output path
+- **Proxy Settings**: HTTP/HTTPS proxy configuration
+- **Aria2c Settings**: Enable/disable, connection count
+- **API Functions**:
+  - `get_config()` / `save_config()` - Load/save configuration
+  - `reset_config()` - Reset to defaults
+  - `create_default_config()` - Create config file
+
+#### ⚡ Speed Improvements (NEW)
+- **Aria2c Integration**: Multi-connection downloads for all sites
+- **Smart Retry**: Exponential backoff with jitter for reliability
+- **Faster Downloads**: Up to 16 parallel connections with aria2c
+- **Python Fallback**: Multi-threaded Python downloader when aria2c unavailable
+- **API Classes**:
+  - `Aria2cDownloader` - High-speed aria2c-based downloads
+  - `PythonDownloader` - Multi-threaded Python fallback
+  - `smart_retry()` decorator - Exponential backoff retry
+
+### 🖥️ CLI Enhancements
+
+#### Progress Bar Improvements (NEW)
+- **Download Speed**: Real-time transfer speed display (KB/s, MB/s)
+- **ETA Display**: Estimated time remaining
+- **File Size**: Total and downloaded size in progress bar
+- **Completion Stats**: Total time and average speed on success
+
+#### New Main Menu (9 Options)
+```
+1. Download Video
+2. Search Videos
+3. Batch Download Multiple Videos
+4. Download Channel/Playlist
+5. View History        ← Enhanced with export/clear
+6. View Statistics     ← Enhanced with dashboard
+7. Active Downloads    ← NEW (Resume/Pause)
+8. Settings            ← NEW (Full config management)
+9. Exit
+```
+
+#### Enhanced Settings Menu
+1. Set Default Quality
+2. Set Download Directory
+3. Configure Proxy
+4. Toggle Aria2c (Fast Downloads)
+5. Toggle Notifications
+6. Toggle Notification Sounds
+7. Test Notification
+8. Open Config File Location
+9. Reset to Defaults
+10. View App Info
+
+### 📦 New Modules
+- `resume_manager.py` - Pausable/resumable download management
+- `notifications.py` - Cross-platform desktop notifications
+- `statistics.py` - Advanced download analytics
+- `config.py` - YAML configuration management
+- `retry.py` - Smart retry with exponential backoff
+- `aria2_downloader.py` - Aria2c/multi-threaded downloads
+- `progress_bar.py` - Enhanced progress with speed/ETA
+
+### 🔧 Changes
+- Enhanced `database.py` with new columns (site, file_size, duration, status)
+- Extended `api.py` with 25+ new API functions
+- Updated `__init__.py` with all new exports
+- CLI interactive mode expanded from 7 to 9 menu options
+- CLI download shows speed, ETA, file size, and completion stats
+- Settings menu expanded from 5 to 11 options
+- Version bumped to 1.0.14
+
+### 📝 Migration Notes
+No breaking changes! All existing code continues to work.
+New features are additive and opt-in.
+
+
+---
+
 ## Version 1.0.10 (2025-01-30) - Hotfix
 
 ### 🐛 Bug Fixes

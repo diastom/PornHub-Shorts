@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.13-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.14-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/ph-shorts?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/ph-shorts)
@@ -65,10 +65,11 @@ pip install .
 
 ## ✨ Features
 
+### Core Features
 - **Multi-Site Support** - Download from 4 adult content sites
 - **Automatic Site Detection** - Just paste any supported URL
 - **Beautiful CLI** - Rich terminal UI with colors and progress bars
-- **Fast Downloads** - Multi-threaded segment downloading
+- **Fast Downloads** - Multi-threaded + aria2c support (up to 16 connections)
 - **Quality Selection** - Choose from available qualities (up to 4K!)
 - **Batch Downloads** - Download multiple videos concurrently
 - **Playlist/Channel Support** - Download entire channels
@@ -77,6 +78,15 @@ pip install .
 - **Proxy Support** - Built-in HTTP/HTTPS proxy support
 - **Python API** - Use as a library for automation
 - **Async Support** - Perfect for bot integration
+
+### NEW in v1.0.14 ✨
+- **⏯️ Resume/Pause** - Pause downloads and resume later
+- **⚙️ Config File** - YAML-based persistent settings
+- **🔔 Notifications** - Desktop alerts on download completion
+- **📊 Statistics** - Comprehensive download analytics dashboard
+- **⚡ Aria2c Integration** - Multi-connection fast downloads
+- **📈 Speed/ETA Display** - Real-time transfer speed and ETA
+
 
 ---
 
@@ -94,15 +104,15 @@ You'll get a beautiful interactive menu:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║  ██████╗ ███████╗██████╗ ██╗     ██╗ ██████╗ ██╗  ██╗████████╗  ║
-║  ██╔══██╗██╔════╝██╔══██╗██║     ██║██╔════╝ ██║  ██║╚══██╔══╝  ║
-║  ██████╔╝█████╗  ██║  ██║██║     ██║██║  ███╗███████║   ██║     ║
-║  ██╔══██╗██╔══╝  ██║  ██║██║     ██║██║   ██║██╔══██║   ██║     ║
-║  ██║  ██║███████╗██████╔╝███████╗██║╚██████╔╝██║  ██║   ██║     ║
-║  ╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝     ║
-║          Professional Adult Content Downloader                  ║
+║  ██████╗ ███████╗██████╗ ██╗     ██╗ ██████╗ ██╗  ██╗████████╗   ║
+║  ██╔══██╗██╔════╝██╔══██╗██║     ██║██╔════╝ ██║  ██║╚══██╔══╝   ║
+║  ██████╔╝█████╗  ██║  ██║██║     ██║██║  ███╗███████║   ██║      ║
+║  ██╔══██╗██╔══╝  ██║  ██║██║     ██║██║   ██║██╔══██║   ██║      ║
+║  ██║  ██║███████╗██████╔╝███████╗██║╚██████╔╝██║  ██║   ██║      ║
+║  ╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ║
+║          Professional Adult Content Downloader                   ║
 ╚══════════════════════════════════════════════════════════════════╝
-                    version 1.0.13 • RedLight DL
+                    version 1.0.14 • RedLight DL
 ```
 
 
@@ -124,59 +134,8 @@ ph-shorts "URL" -p http://127.0.0.1:1080
 
 ---
 
-## 📝 Examples
 
-### Basic Download (Works with ANY Site!)
-
-```python
-from RedLight import DownloadVideo
-
-# PornHub
-DownloadVideo("https://www.pornhub.com/view_video.php?viewkey=xxxxx")
-
-# Eporner (ultra-fast with aria2c!)
-DownloadVideo("https://www.eporner.com/video-xxxxx/title")
-
-# Spankbang (4K support!)
-DownloadVideo("https://spankbang.com/xxxxx/video/title")
-
-# XVideos
-DownloadVideo("https://www.xvideos.com/video.xxxxx/title")
-```
-
-### Batch Download from Multiple Sites
-
-```python
-from RedLight import BatchDownloader
-
-urls = [
-    "https://www.pornhub.com/view_video.php?viewkey=xxxxx",
-    "https://www.eporner.com/video-xxxxx/title",
-    "https://spankbang.com/xxxxx/video/title"
-]
-
-downloader = BatchDownloader(concurrent=True, max_workers=3)
-downloader.AddUrls(urls)
-results = downloader.DownloadAll()
-```
-
-### Multi-Site Search
-
-```python
-from RedLight import MultiSiteSearch, DownloadVideo
-
-# Search across all sites
-searcher = MultiSiteSearch()
-results = searcher.search_all("your search term")
-
-print(f"Found {len(results)} videos across all sites")
-
-# Download top result from each site
-for video in results[:4]:
-    DownloadVideo(video['url'])
-```
-
-### More Examples
+## Examples
 
 Check the [`examples/`](examples/) directory for complete working examples:
 - [`basic_usage.py`](examples/basic_usage.py) - Multi-site basics
