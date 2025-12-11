@@ -11,6 +11,7 @@ from ..playlist import PlaylistDownloader
 from ..batch import BatchDownloader
 from ..converter import VideoConverter
 
+
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.argument('url', required=False)
 @click.option('-o', '--output', 
@@ -91,26 +92,11 @@ from ..converter import VideoConverter
               is_eager=True,
               help='Show version information and exit')
 def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compress, audio_only, search, sort, duration, channel, limit, batch, concurrent):
-    """
-    RedLight DL - Professional Adult Content Downloader
     
-    USAGE:
-      ph-shorts [URL] [OPTIONS]
-      ph-shorts                    # Interactive mode
-      ph-shorts --help             # Show this help
-    
-    EXAMPLES:
-      ph-shorts
-      ph-shorts "URL" -q 1080
-      ph-shorts "URL" --batch "URL1,URL2"
-    """
-    
-    # Handle search mode
     if search:
         search_cli_mode(search, sort_by=sort, duration=duration)
         return
     
-    # Handle channel mode
     if channel:
 
         
@@ -129,7 +115,6 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
         console.print(f"\n[cyan]📦 Batch downloading {len(urls)} video(s)...[/]")
         console.print(f"[cyan]Mode:[/] {'Concurrent' if concurrent else 'Sequential'}\n")
         
-        # Optimization: If converting later, keep TS to avoid double conversion
         doing_conversion = format is not None or compress is not None or audio_only
         effective_keep_ts = keep_ts or doing_conversion
         
@@ -166,7 +151,6 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
                 progress.update(task, completed=completed_count)
                 progress.console.print(f"[green]✓[/] Downloaded: {Path(path).name}")
                 
-                # Handle conversion if requested
                 if format or compress is not None or audio_only:
                     process_video_conversion(
                         video_path=path,
@@ -193,7 +177,6 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
         console.print(f"[cyan]Successfully downloaded:[/] {len(results)}/{len(urls)}")
         return
 
-    # Handle batch mode
     if batch:
         urls = [url.strip() for url in batch.split(',') if url.strip()]
         
@@ -204,10 +187,8 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
         show_banner()
         console.print(f"\n[cyan]📦 Batch downloading {len(urls)} video(s)...[/]")
         console.print(f"[cyan]Mode:[/] {'Concurrent' if concurrent else 'Sequential'}\n")
-        
 
         
-        # Optimization: If converting later, keep TS to avoid double conversion
         doing_conversion = format is not None or compress is not None or audio_only
         effective_keep_ts = keep_ts or doing_conversion
         
@@ -236,8 +217,7 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
             completed_count = 0
             
             def on_progress(completed, total, current_url):
-                # This gets called during download
-                pass  # We'll update in on_complete instead
+                pass
             
             def on_complete(url, path):
                 nonlocal completed_count
@@ -245,7 +225,6 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
                 progress.update(task, completed=completed_count)
                 progress.console.print(f"[green]✓[/] Downloaded: {Path(path).name}")
                 
-                # Handle conversion if requested
                 if doing_conversion:
                     process_video_conversion(
                         video_path=path,
@@ -273,20 +252,15 @@ def main(url, output, quality, proxy, keep_ts, subs, speed_limit, format, compre
         return
     
     if not url:
-        # Interactive mode
         interactive_mode()
     else:
-        # CLI mode
         show_banner()
         
-        # Optimization: If we are going to convert/compress later, 
-        # don't waste time converting to MP4 first. Keep the raw TS file.
         doing_conversion = format is not None or compress is not None or audio_only
         effective_keep_ts = keep_ts or doing_conversion
         
         video_path = download_video(url, output=output, quality=quality, proxy=proxy, keep_ts=effective_keep_ts, subs=subs, speed_limit=speed_limit)
         
-        # Post-download conversion if requested
         if doing_conversion:
             process_video_conversion(
                 video_path=video_path,

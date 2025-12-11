@@ -1,9 +1,3 @@
-"""
-XVideos.com downloader and search implementation.
-
-Wraps the existing XVideos downloader to fit the RedLight architecture.
-"""
-
 import re
 import requests
 import subprocess
@@ -18,7 +12,6 @@ from .base import BaseSiteDownloader, BaseSiteSearch
 
 
 class XVideosDownloader(BaseSiteDownloader):
-    """XVideos.com video downloader."""
     
     def __init__(self):
         self.session = requests.Session()
@@ -112,7 +105,7 @@ class XVideosDownloader(BaseSiteDownloader):
         
         import html as html_lib
         
-        title_match = re.search(r"html5player\.setVideoTitle\(['\"](.*?)['\"]", content)
+        title_match = re.search(r"html5player\.setVideoTitle\(['\"](.+?)['\"]\)", content)
         if not title_match:
             title_match = re.search(r'<title>(.*?)</title>', content)
         
@@ -124,15 +117,15 @@ class XVideosDownloader(BaseSiteDownloader):
         
         links = {}
         
-        hq_match = re.search(r"html5player\.setVideoUrlHigh\(['\"](.*?)['\"]", content)
+        hq_match = re.search(r"html5player\.setVideoUrlHigh\(['\"](.+?)['\"]\)", content)
         if hq_match and hq_match.group(1):
             links['High Quality'] = unquote(hq_match.group(1))
         
-        lq_match = re.search(r"html5player\.setVideoUrlLow\(['\"](.*?)['\"]", content)
+        lq_match = re.search(r"html5player\.setVideoUrlLow\(['\"](.+?)['\"]\)", content)
         if lq_match and lq_match.group(1):
             links['Low Quality'] = unquote(lq_match.group(1))
         
-        hls_match = re.search(r"html5player\.setVideoHLS\(['\"](.*?)['\"]", content)
+        hls_match = re.search(r"html5player\.setVideoHLS\(['\"](.+?)['\"]\)", content)
         if hls_match and hls_match.group(1):
             links['HLS (Adaptive)'] = unquote(hls_match.group(1))
         
@@ -268,7 +261,6 @@ class XVideosDownloader(BaseSiteDownloader):
 
 
 class XVideosSearch(BaseSiteSearch):
-    """XVideos.com search implementation."""
     
     def __init__(self):
         self.base_url = "https://www.xvideos.com"

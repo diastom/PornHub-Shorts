@@ -13,10 +13,6 @@ from .converter import VideoConverter
 
 
 class CustomHLSDownloader:
-    """
-    PH Shorties Downloader - A robust tool to download HLS streams from PH Shorties.
-    Features: Quality selection, Proxy support, Auto-retry, Speed limiting, and FFmpeg conversion.
-    """
 
     def __init__(self, output_name: str = None, headers: dict | None = None, 
                  keep_ts: bool = False, proxy: str = None, progress_callback=None, speed_limit: str = None):
@@ -26,14 +22,12 @@ class CustomHLSDownloader:
         self.progress_callback = progress_callback
         self.speed_limit = self._parse_speed_limit(speed_limit) if speed_limit else None
         
-        # Proxy Configuration
         if proxy:
             self.session.proxies.update({
                 'http': proxy,
                 'https': proxy
             })
 
-        # Default Headers (mimicking a real browser)
         default_headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -165,7 +159,6 @@ class CustomHLSDownloader:
                             if not clean_url.startswith('http'):
                                  continue
                             
-                            # Try to extract quality from URL
                             q_match = re.search(r'(\d{3,4})[Pp]', clean_url)
                             if q_match:
                                 streams[int(q_match.group(1))] = clean_url
@@ -183,23 +176,19 @@ class CustomHLSDownloader:
             raise RuntimeError(f"Extraction failed: {e}")
 
     def extract_video_id(self, url: str) -> str:
-        """Extracts video ID from URL."""
         match = re.search(r'viewkey=([a-zA-Z0-9]+)', url)
         if match:
             return match.group(1)
         return "unknown"
     
     def _extract_shorties_id(self, url: str) -> str:
-        """Extracts shorties ID from shorties URL."""
         match = re.search(r'/shorties/([a-zA-Z0-9]+)', url)
         if match:
             return match.group(1)
         return None
 
     def download_subtitles(self, html_content: str, output_base: Path) -> bool:
-        """Attempts to find and download subtitles."""
         try:
-            # Look for captions in mediaDefinitions
             media_def_match = re.search(r'mediaDefinitions\s*[:=]\s*(\[.+?\])', html_content)
             if media_def_match:
                 definitions = json.loads(media_def_match.group(1))
@@ -220,13 +209,11 @@ class CustomHLSDownloader:
             return False
 
     def _get_qualities(self, playlist_content: str, base_url: str) -> dict:
-        """Parses Master Playlist and returns dict {height: url}."""
         lines = playlist_content.splitlines()
         qualities = {}
         
         for i, line in enumerate(lines):
             if line.startswith("#EXT-X-STREAM-INF"):
-                # Extract resolution (e.g., RESOLUTION=720x1280)
                 res_match = re.search(r'RESOLUTION=\d+x(\d+)', line)
                 
                 url = lines[i+1].strip()
@@ -237,7 +224,6 @@ class CustomHLSDownloader:
                     height = int(res_match.group(1))
                     qualities[height] = url
                 else:
-                    # Fallback for streams without explicit resolution tag
                     qualities[f"stream_{i}"] = url
                     
         return qualities
@@ -346,7 +332,6 @@ class CustomHLSDownloader:
     def _download_segment(self, url: str, index: int, save_dir: Path) -> Path:
         filename = save_dir / f"segment_{index:04d}.ts"
         
-        # Resume logic: Skip if already downloaded
         if filename.exists() and filename.stat().st_size > 0:
             return filename
 
@@ -357,7 +342,6 @@ class CustomHLSDownloader:
                 if response.status_code != 200:
                     raise requests.RequestException(f"Status {response.status_code}")
                 
-                # Check content-length if available
                 content_length = response.headers.get('content-length')
                 if content_length and int(content_length) == 0:
                     raise requests.RequestException("Empty content-length")
@@ -365,11 +349,10 @@ class CustomHLSDownloader:
                 bytes_downloaded = 0
                 with open(filename, 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:  # Filter out keep-alive chunks
+                        if chunk:
                             f.write(chunk)
                             bytes_downloaded += len(chunk)
                 
-                # Validate downloaded file
                 if bytes_downloaded == 0 or not filename.exists() or filename.stat().st_size == 0:
                     if filename.exists():
                         filename.unlink()
@@ -383,5 +366,3 @@ class CustomHLSDownloader:
                 else:
                     raise Exception(f"Failed to download segment {index} after {retries} retries: {e}")
         raise Exception(f"Failed to download segment after {retries} retries")
-
-

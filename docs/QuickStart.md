@@ -32,7 +32,7 @@ pip install -e .
 
 ## 🌐 Multi-Site Support
 
-RedLight supports **4 major adult content sites** with automatic detection:
+RedLight supports **6 major adult content sites** with automatic detection:
 
 | Site | Technology | Max Quality | Special Features |
 |------|------------|-------------|------------------|
@@ -40,6 +40,8 @@ RedLight supports **4 major adult content sites** with automatic detection:
 | **Eporner** | Direct MP4 + aria2c | 1080p | Ultra-fast downloads |
 | **Spankbang** | Hybrid MP4/HLS | 4K | Intelligent format selection |
 | **XVideos** | Multi-quality MP4/HLS | 1080p | Intelligent fallback |
+| **xHamster** | HLS Streaming | 1080p | Multi-quality, Geo-fallback |
+| **XNXX** | Multi-quality MP4/HLS | 1080p | Same as XVideos |
 
 **Best Part**: You don't need to do anything special! Just paste any supported URL and RedLight automatically uses the correct downloader.
 
@@ -63,6 +65,12 @@ video_path = DownloadVideo("https://spankbang.com/xxxxx/video/title")
 
 # Works with XVideos
 video_path = DownloadVideo("https://www.xvideos.com/video.xxxxx/title")
+
+# Works with xHamster
+video_path = DownloadVideo("https://xhamster.com/videos/video-title-xxxxx")
+
+# Works with XNXX
+video_path = DownloadVideo("https://www.xnxx.com/video-xxxxx/title")
 
 print(f"Downloaded: {video_path}")
 ```

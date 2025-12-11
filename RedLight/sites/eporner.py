@@ -1,7 +1,3 @@
-"""
-Eporner.com downloader and search implementation.
-"""
-
 import requests
 import re
 import json
@@ -17,7 +13,6 @@ from .base import BaseSiteDownloader, BaseSiteSearch
 
 
 class EpornerDownloader(BaseSiteDownloader):
-    """Eporner.com video downloader."""
     
     def __init__(self):
         self.session = requests.Session()
@@ -40,28 +35,22 @@ class EpornerDownloader(BaseSiteDownloader):
         on_progress: Optional[Callable[[int, int], None]] = None
     ) -> str:
 
-        # Extract info and get download links
         title, links = self._extract_info(url)
         
-        # Select quality
         selected_quality = self._select_quality(links, quality)
         download_url = links[selected_quality]
         
-        # Resolve final URL
         final_url = self._get_final_url(download_url)
         
-        # Prepare output path
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
         if filename:
             output_file = output_path / filename
         else:
-            # Clean quality name for filename
             clean_quality = selected_quality.replace(' ', '').replace('(', '').replace(')', '')
             output_file = output_path / f"{self._sanitize_filename(title)}_{clean_quality}.mp4"
         
-        # Download with aria2c or Python downloader
         self._download_manager(final_url, str(output_file), on_progress)
         
         return str(output_file)
@@ -70,15 +59,12 @@ class EpornerDownloader(BaseSiteDownloader):
 
         title, links = self._extract_info(url)
         
-        # Extract available qualities
         available_qualities = []
         for quality_str in links.keys():
-            # Extract numeric quality
             match = re.search(r'(\d{3,4})p', quality_str)
             if match:
                 available_qualities.append(int(match.group(1)))
         
-        # Get video ID
         video_id = self._extract_video_id(url)
         
         return {
@@ -110,7 +96,6 @@ class EpornerDownloader(BaseSiteDownloader):
             response.raise_for_status()
             html_content = response.text
             
-            # Extract title
             title_match = re.search(r'<title>(.*?)</title>', html_content)
             title = "eporner_video"
             if title_match:
@@ -119,7 +104,6 @@ class EpornerDownloader(BaseSiteDownloader):
             
             download_links = {}
             
-            # Method 1: Extract from JSON-LD
             json_ld_match = re.search(r'<script type="application/ld\+json">(.*?)</script>', html_content, re.DOTALL)
             if json_ld_match:
                 try:
@@ -129,14 +113,12 @@ class EpornerDownloader(BaseSiteDownloader):
                 except json.JSONDecodeError:
                     pass
             
-            # Method 2: Extract dload links
             matches = re.findall(r'href="(/dload/[^"]+)"', html_content)
             
             for link in matches:
                 link = link.replace("&amp;", "&")
                 full_link = "https://www.eporner.com" + link
                 
-                # Detect quality
                 quality = "Unknown"
                 if "2160p" in link: quality = "2160p"
                 elif "1440p" in link: quality = "1440p"
@@ -146,14 +128,12 @@ class EpornerDownloader(BaseSiteDownloader):
                 elif "360p" in link: quality = "360p"
                 elif "240p" in link: quality = "240p"
                 
-                # Add AV1 label if applicable
                 if "av1" in link.lower():
                     quality += " (AV1)"
                 
                 if quality not in download_links:
                     download_links[quality] = full_link
             
-            # Clean up duplicate JSON link
             if 'Best (JSON)' in download_links:
                 best_url = download_links['Best (JSON)']
                 is_duplicate = any(v == best_url for k, v in download_links.items() if k != 'Best (JSON)')
@@ -161,7 +141,6 @@ class EpornerDownloader(BaseSiteDownloader):
                 if is_duplicate:
                     del download_links['Best (JSON)']
                 else:
-                    # Try to identify quality from URL
                     match_res = re.search(r'(\d{3,4})p', best_url) or re.search(r'/(\d{3,4})/', best_url)
                     if match_res:
                         res = match_res.group(1) + "p (Source)"
@@ -179,7 +158,6 @@ class EpornerDownloader(BaseSiteDownloader):
     
     def _select_quality(self, links: Dict[str, str], quality: str) -> str:
 
-        # Sort qualities: non-AV1 first, then by resolution
         def sort_key(k):
             is_av1 = 1 if "(AV1)" in k else 0
             res = 0
@@ -195,13 +173,11 @@ class EpornerDownloader(BaseSiteDownloader):
         elif quality == 'worst':
             return sorted_keys[-1]
         else:
-            # Try to match specific quality
             try:
                 req_q = int(quality)
                 for key in sorted_keys:
                     if f"{req_q}p" in key:
                         return key
-                # Fallback to closest
                 return sorted_keys[0]
             except ValueError:
                 return sorted_keys[0]
@@ -223,7 +199,6 @@ class EpornerDownloader(BaseSiteDownloader):
             if success:
                 return
         
-        # Fallback to Python multi-threaded downloader
         self._download_python_multithreaded(url, filename, on_progress)
     
     def _download_with_aria2c(self, url: str, filename: str) -> bool:
@@ -328,7 +303,6 @@ class EpornerDownloader(BaseSiteDownloader):
 
 
 class EpornerSearch(BaseSiteSearch):
-    """Eporner.com search implementation."""
     
     def __init__(self):
         self.base_url = "https://www.eporner.com"
@@ -348,14 +322,11 @@ class EpornerSearch(BaseSiteSearch):
     ) -> List[Dict[str, Any]]:
 
         try:
-            # Build search URL
             search_url = f"{self.base_url}/search/{query}/"
             
-            # Add page parameter
             if page > 1:
                 search_url += f"{page}/"
             
-            # Add sort parameter
             params = {}
             if sort_by == "views":
                 params['order'] = 'top-weekly'
@@ -364,20 +335,16 @@ class EpornerSearch(BaseSiteSearch):
             elif sort_by == "date":
                 params['order'] = 'latest-updates'
             
-            # Fetch search results
             response = self.session.get(search_url, params=params, timeout=10)
             response.raise_for_status()
             
-            # Parse results
             soup = BeautifulSoup(response.text, 'html.parser')
             results = []
             
-            # Find video containers (adjust selectors based on actual HTML structure)
             video_items = soup.find_all('div', class_='mb')
             
-            for item in video_items[:50]:  # Limit to 50 results
+            for item in video_items[:50]:
                 try:
-                    # Extract video link
                     link_elem = item.find('a', href=True)
                     if not link_elem:
                         continue
@@ -386,18 +353,14 @@ class EpornerSearch(BaseSiteSearch):
                     if not video_url.startswith('http'):
                         video_url = self.base_url + video_url
                     
-                    # Extract title
                     title_elem = link_elem.get('title') or link_elem.text.strip()
                     
-                    # Extract thumbnail
                     img_elem = item.find('img')
                     thumbnail = img_elem.get('src', '') if img_elem else ''
                     
-                    # Extract duration
                     duration_elem = item.find('div', class_='mbtim')
                     duration_str = duration_elem.text.strip() if duration_elem else ''
                     
-                    # Extract views (if available)
                     views_elem = item.find('div', class_='mbvie')
                     views_str = views_elem.text.strip() if views_elem else ''
                     
@@ -426,5 +389,5 @@ class EpornerSearch(BaseSiteSearch):
 
         return {
             "sort_by": ["relevance", "views", "rating", "date"],
-            "duration": []  # Eporner doesn't have duration filters in basic search
+            "duration": []
         }

@@ -1,5 +1,3 @@
-"""Cross-platform desktop notifications for RedLight DL."""
-
 import sys
 import subprocess
 import shutil
@@ -17,7 +15,6 @@ class NotificationConfig:
 
 
 class NotificationManager:
-    """Cross-platform notifications with optional sound alerts."""
     
     def __init__(self, enabled=True, sound_enabled=True):
         self.config = NotificationConfig(enabled=enabled, sound_enabled=sound_enabled)

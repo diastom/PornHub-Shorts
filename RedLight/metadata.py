@@ -1,24 +1,10 @@
-"""
-Metadata Editor Module - Edit video metadata and thumbnails.
-
-This module provides functionality to modify video metadata (title, artist,
-description, etc.) and set custom thumbnails using FFmpeg.
-"""
-
 import subprocess
 import shutil
 from pathlib import Path
 from typing import Optional, Dict, List
 
+
 class MetadataEditor:
-    """
-    Edit video metadata and thumbnails using FFmpeg.
-    
-    Example:
-        >>> editor = MetadataEditor()
-        >>> editor.SetMetadata("video.mp4", title="My Video", artist="Me")
-        >>> editor.SetThumbnail("video.mp4", "thumb.jpg")
-    """
     
     def __init__(self):
         self.ffmpeg_available = shutil.which("ffmpeg") is not None
@@ -36,13 +22,11 @@ class MetadataEditor:
         date: Optional[str] = None,
         output_path: Optional[str] = None
     ) -> str:
-        """Set video metadata tags."""
         input_path = Path(video_path)
         if not input_path.exists():
             raise FileNotFoundError(f"Video not found: {video_path}")
             
         if not output_path:
-            # Create temp file then move back
             temp_output = input_path.with_suffix(f".meta{input_path.suffix}")
         else:
             temp_output = Path(output_path)
@@ -50,11 +34,10 @@ class MetadataEditor:
         cmd = [
             'ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
             '-i', str(input_path),
-            '-c', 'copy',  # Copy streams without re-encoding
-            '-map_metadata', '0'  # Keep existing metadata
+            '-c', 'copy',
+            '-map_metadata', '0'
         ]
         
-        # Add metadata flags
         metadata = {
             'title': title,
             'artist': artist,
@@ -74,7 +57,6 @@ class MetadataEditor:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             
             if not output_path:
-                # Overwrite original
                 shutil.move(str(temp_output), str(input_path))
                 return str(input_path)
             
@@ -86,7 +68,6 @@ class MetadataEditor:
             raise RuntimeError(f"FFmpeg metadata error: {e.stderr}")
 
     def SetThumbnail(self, video_path: str, thumbnail_path: str, output_path: Optional[str] = None) -> str:
-        """Embed a custom thumbnail into the video."""
         input_path = Path(video_path)
         thumb_path = Path(thumbnail_path)
         
@@ -100,8 +81,6 @@ class MetadataEditor:
         else:
             temp_output = Path(output_path)
             
-        # Command to embed cover art
-        # Note: This works best for MP4/M4V. MKV support varies.
         cmd = [
             'ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
             '-i', str(input_path),

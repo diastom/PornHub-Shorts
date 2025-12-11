@@ -1,7 +1,3 @@
-"""
-SpankBang.com downloader and search implementation.
-"""
-
 import requests
 import re
 import json
@@ -15,7 +11,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Callable, Any
 from bs4 import BeautifulSoup
 
-# Selenium imports
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
@@ -29,7 +24,6 @@ from .base import BaseSiteDownloader, BaseSiteSearch
 
 
 class SpankBangDownloader(BaseSiteDownloader):
-    """SpankBang.com video downloader."""
     
     def __init__(self):
         self.session = requests.Session()
@@ -51,14 +45,11 @@ class SpankBangDownloader(BaseSiteDownloader):
         on_progress: Optional[Callable[[int, int], None]] = None
     ) -> str:
         
-        # Extract info
         title, links = self._extract_info(url)
         
-        # Select quality
         selected_quality = self._select_quality(links, quality)
         download_url = links[selected_quality]
         
-        # Prepare output path
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
@@ -68,7 +59,6 @@ class SpankBangDownloader(BaseSiteDownloader):
             clean_quality = selected_quality.replace(' ', '').replace('(', '').replace(')', '')
             output_file = output_path / f"{self._sanitize_filename(title)}_{clean_quality}.mp4"
             
-        # Download
         if 'm3u8' in download_url:
             self._download_hls_ffmpeg(download_url, str(output_file))
         else:
@@ -81,7 +71,6 @@ class SpankBangDownloader(BaseSiteDownloader):
         
         available_qualities = []
         for q in links.keys():
-            # Extract numeric quality
             match = re.search(r'(\d+)p', q) or re.search(r'(4k)', q)
             if match:
                 val = match.group(1)
@@ -108,7 +97,6 @@ class SpankBangDownloader(BaseSiteDownloader):
         return "spankbang"
         
     def _extract_info(self, url: str) -> tuple[str, Dict[str, str]]:
-        # Attempt 1: Requests
         try:
             response = self.session.get(url, timeout=10)
             if response.status_code == 403:
@@ -118,13 +106,11 @@ class SpankBangDownloader(BaseSiteDownloader):
             return self._parse_html(response.text)
             
         except (requests.exceptions.RequestException, ValueError):
-            # Attempt 2: Selenium
             if not SELENIUM_AVAILABLE:
                 raise RuntimeError("Requests failed and Selenium is not available. Please install selenium and webdriver-manager.")
             return self._extract_with_selenium(url)
             
     def _parse_html(self, html_content: str) -> tuple[str, Dict[str, str]]:
-        # Extract title
         title_match = re.search(r'<h1[^>]*title="([^"]+)"', html_content)
         if not title_match:
             title_match = re.search(r'<title>(.*?)</title>', html_content)
@@ -135,7 +121,6 @@ class SpankBangDownloader(BaseSiteDownloader):
             title = re.sub(r'\s*-\s*SpankBang.*$', '', raw_title, flags=re.IGNORECASE)
             title = re.sub(r'[\\/*?:"<>|]', "", title).strip()
             
-        # Extract stream data
         stream_match = re.search(r'var\s+stream_data\s*=\s*({.*?});', html_content, re.DOTALL)
         if not stream_match:
             raise ValueError("stream_data not found in HTML source.")
@@ -144,7 +129,6 @@ class SpankBangDownloader(BaseSiteDownloader):
         try:
             data = ast.literal_eval(stream_data_str)
         except:
-            # Fallback Regex Parsing
             data = {}
             matches = re.findall(r"'(\d+p|4k)'\s*:\s*\['([^']+)'\]", stream_data_str)
             for q, l in matches:
@@ -171,12 +155,10 @@ class SpankBangDownloader(BaseSiteDownloader):
             if not stream_data:
                 raise ValueError("Could not extract stream_data even with Selenium.")
                 
-            # Transfer cookies
             cookies = self.driver.get_cookies()
             for cookie in cookies:
                 self.session.cookies.set(cookie['name'], cookie['value'])
             
-            # Update UA
             ua = self.driver.execute_script("return navigator.userAgent;")
             self.session.headers.update({'User-Agent': ua})
             
@@ -214,7 +196,6 @@ class SpankBangDownloader(BaseSiteDownloader):
         return title, download_links
         
     def _select_quality(self, links: Dict[str, str], quality: str) -> str:
-        # Sort qualities
         def sort_key(k):
             if k == '4k': return 2160
             if 'm3u8' in k: return 0
@@ -230,7 +211,6 @@ class SpankBangDownloader(BaseSiteDownloader):
         else:
             try:
                 req_q = int(quality)
-                # Find closest
                 best_match = sorted_keys[0]
                 min_diff = float('inf')
                 
@@ -272,7 +252,6 @@ class SpankBangDownloader(BaseSiteDownloader):
             head = self.session.head(url, allow_redirects=True)
             file_size = int(head.headers.get('content-length', 0))
         except:
-            # Fallback single thread
             with self.session.get(url, stream=True) as r:
                 r.raise_for_status()
                 with open(filename, 'wb') as f:
@@ -330,7 +309,6 @@ class SpankBangDownloader(BaseSiteDownloader):
 
 
 class SpankBangSearch(BaseSiteSearch):
-    """SpankBang search implementation (Basic)."""
     
     def __init__(self):
         self.base_url = "https://spankbang.com"
@@ -340,7 +318,6 @@ class SpankBangSearch(BaseSiteSearch):
         })
         
     def search(self, query: str, page: int = 1, sort_by: str = "relevance", duration: Optional[str] = None, **kwargs) -> List[Dict[str, Any]]:
-        # Basic search implementation
         search_url = f"{self.base_url}/s/{query}/{page}/"
         params = {}
         if sort_by == 'views': params['o'] = 'trending'
@@ -362,22 +339,18 @@ class SpankBangSearch(BaseSiteSearch):
         soup = BeautifulSoup(html_content, 'html.parser')
         results = []
         
-        # Try new selector based on data-testid
         items = soup.select('div[data-testid="video-item"]')
         if not items:
-            # Fallback to old selector just in case
             items = soup.select('div.video-item')
             
         for item in items:
             try:
-                # Find link - usually the first anchor tag or one with specific class
                 link = item.find('a', href=True)
                 if not link: continue
                 
                 href = link['href']
                 if not href.startswith('http'): href = self.base_url + href
                 
-                # Title might be in an img alt or title attribute of link
                 img = item.find('img')
                 title = link.get('title') or (img.get('alt') if img else None) or "Unknown Video"
                 
@@ -385,7 +358,6 @@ class SpankBangSearch(BaseSiteSearch):
                 if img:
                     thumb = img.get('src') or img.get('data-src') or ''
                 
-                # Duration
                 duration = ''
                 dur_elem = item.select_one('[data-testid="video-item-length"]')
                 if dur_elem:
@@ -417,14 +389,13 @@ class SpankBangSearch(BaseSiteSearch):
             service = Service(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
             
-            # Construct full URL with params if needed (simple append for now as params are simple)
             if params:
                 from urllib.parse import urlencode
                 if '?' in url: url += '&' + urlencode(params)
                 else: url += '?' + urlencode(params)
             
             driver.get(url)
-            time.sleep(5) # Wait for CF
+            time.sleep(5)
             
             return self._parse_results(driver.page_source)
         except Exception:

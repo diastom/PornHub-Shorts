@@ -1,18 +1,9 @@
-"""
-Multi-Site Search - Search across all supported sites simultaneously.
-"""
-
 import concurrent.futures
 from typing import List, Dict, Optional, Callable, Any
 from .sites import SiteRegistry
 
 
 class MultiSiteSearch:
-    """
-    Search across all registered sites concurrently.
-    
-    Aggregates results from all supported sites and provides unified interface.
-    """
     
     def __init__(self):
         self.registry = SiteRegistry()
@@ -25,13 +16,10 @@ class MultiSiteSearch:
         duration: Optional[str] = None,
         on_site_complete: Optional[Callable[[str, int], None]] = None
     ) -> List[Dict[str, Any]]:
-        """Search all sites concurrently and aggregate results."""
         all_searchers = self.registry.get_all_searchers()
         all_results = []
         
-        # Search each site in parallel
         with concurrent.futures.ThreadPoolExecutor(max_workers=len(all_searchers)) as executor:
-            # Submit all search tasks
             future_to_site = {
                 executor.submit(
                     self._search_single_site,
@@ -44,7 +32,6 @@ class MultiSiteSearch:
                 for site_name, searcher in all_searchers.items()
             }
             
-            # Collect results as they complete
             for future in concurrent.futures.as_completed(future_to_site):
                 site_name = future_to_site[future]
                 try:
@@ -54,7 +41,6 @@ class MultiSiteSearch:
                     if on_site_complete:
                         on_site_complete(site_name, len(results))
                 except Exception:
-                    # Site search failed, skip it
                     if on_site_complete:
                         on_site_complete(site_name, 0)
         
@@ -70,7 +56,6 @@ class MultiSiteSearch:
     ) -> List[Dict[str, Any]]:
 
         try:
-            # Map common sort options to site-specific ones
             site_sort = sort_by
             if sort_by == "views" and "mostviewed" in searcher.get_search_filters().get("sort_by", []):
                 site_sort = "mostviewed"

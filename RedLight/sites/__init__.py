@@ -1,17 +1,12 @@
-"""
-RedLight Sites Module - Multi-site support infrastructure.
-
-This module provides the base architecture for supporting multiple adult content sites.
-"""
-
 from .base import BaseSiteDownloader, BaseSiteSearch
 from .registry import SiteRegistry
 
-# Import site implementations
 from .pornhub import PornHubDownloader, PornHubSearch
 from .eporner import EpornerDownloader, EpornerSearch
 from .spankbang import SpankBangDownloader, SpankBangSearch
 from .xvideos import XVideosDownloader, XVideosSearch
+from .xhamster import XHamsterDownloader, XHamsterSearch
+from .xnxx import XNXXDownloader, XNXXSearch
 
 _registry = SiteRegistry()
 
@@ -39,6 +34,18 @@ _registry.register_site(
     search_class=XVideosSearch
 )
 
+_registry.register_site(
+    name="xhamster",
+    downloader_class=XHamsterDownloader,
+    search_class=XHamsterSearch
+)
+
+_registry.register_site(
+    name="xnxx",
+    downloader_class=XNXXDownloader,
+    search_class=XNXXSearch
+)
+
 __all__ = [
     "BaseSiteDownloader",
     "BaseSiteSearch",
@@ -51,4 +58,8 @@ __all__ = [
     "SpankBangSearch",
     "XVideosDownloader",
     "XVideosSearch",
+    "XHamsterDownloader",
+    "XHamsterSearch",
+    "XNXXDownloader",
+    "XNXXSearch",
 ]

@@ -31,8 +31,8 @@ def example_mixed_batch_download():
         "https://www.eporner.com/video-xxxxx/title",
         "https://spankbang.com/xxxxx/video/title",
         "https://www.xvideos.com/video.xxxxx/title",
-        "https://www.pornhub.com/view_video.php?viewkey=yyyyy",
-        "https://www.eporner.com/video-yyyyy/another"
+        "https://xhamster.com/videos/video-title-xxxxx",
+        "https://www.xnxx.com/video-xxxxx/title"
     ]
     
     # RedLight automatically handles all sites
@@ -80,7 +80,9 @@ def example_organized_downloads():
         "https://www.pornhub.com/view_video.php?viewkey=xxxxx",
         "https://www.eporner.com/video-xxxxx/title",
         "https://spankbang.com/xxxxx/video/title",
-        "https://www.xvideos.com/video.xxxxx/title"
+        "https://www.xvideos.com/video.xxxxx/title",
+        "https://xhamster.com/videos/video-title-xxxxx",
+        "https://www.xnxx.com/video-xxxxx/title"
     ]
     
     registry = SiteRegistry()
@@ -133,6 +135,8 @@ def example_organized_downloads():
     print("  ./downloads/eporner/")
     print("  ./downloads/spankbang/")
     print("  ./downloads/xvideos/")
+    print("  ./downloads/xhamster/")
+    print("  ./downloads/xnxx/")
     
     return results
 
@@ -148,7 +152,9 @@ def example_site_specific_downloaders():
         PornHubDownloader,
         EpornerDownloader,
         SpankBangDownloader,
-        XVideosDownloader
+        XVideosDownloader,
+        XHamsterDownloader,
+        XNXXDownloader
     )
     
     # PornHub downloader
@@ -170,6 +176,14 @@ def example_site_specific_downloaders():
     print("\n[XVideos] Intelligent Fallback")
     xv = XVideosDownloader(output_dir="./downloads/xvideos")
     print("  ✓ Configured for MP4/HLS fallback")
+    
+    print("\n[xHamster] HLS Multi-Quality")
+    xh = XHamsterDownloader(output_dir="./downloads/xhamster")
+    print("  ✓ Configured for HLS streaming with geo-fallback")
+    
+    print("\n[XNXX] Multi-Quality MP4/HLS")
+    xn = XNXXDownloader(output_dir="./downloads/xnxx")
+    print("  ✓ Configured for MP4/HLS downloads")
     
     print("\nEach downloader is optimized for its specific site!")
 
@@ -227,7 +241,7 @@ This example demonstrates:
 • Site-specific downloaders
 • Comprehensive error handling
 
-Supported sites: PornHub, Eporner, Spankbang, XVideos
+Supported sites: PornHub, Eporner, Spankbang, XVideos, xHamster, XNXX
 """)
     
     # Run examples

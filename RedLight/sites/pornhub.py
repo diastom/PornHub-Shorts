@@ -1,9 +1,3 @@
-"""
-PornHub.com downloader and search implementation.
-
-Wraps existing CustomHLSDownloader to fit new architecture.
-"""
-
 from pathlib import Path
 from typing import Dict, List, Optional, Callable, Any
 
@@ -13,7 +7,6 @@ from ..search import PornHubSearch as OriginalPornHubSearch
 
 
 class PornHubDownloader(BaseSiteDownloader):
-    """PornHub.com video downloader using HLS streaming."""
     
     def download(
         self,
@@ -26,7 +19,6 @@ class PornHubDownloader(BaseSiteDownloader):
         on_progress: Optional[Callable[[int, int], None]] = None
     ) -> str:
 
-        # Prepare output path
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
@@ -34,7 +26,6 @@ class PornHubDownloader(BaseSiteDownloader):
         if filename:
             output_file = output_path / filename
         
-        # Initialize HLS downloader
         downloader = CustomHLSDownloader(
             output_name=str(output_file) if output_file else None,
             keep_ts=keep_original,
@@ -42,15 +33,12 @@ class PornHubDownloader(BaseSiteDownloader):
             progress_callback=on_progress
         )
         
-        # Extract video info and streams
         streams = downloader.extract_video_info(url)
         
-        # Update output path if auto-detected
         if not output_file and downloader.output_name:
             final_output = output_path / downloader.output_name.name
             downloader.output_name = final_output
         
-        # Select stream based on quality
         if isinstance(streams, dict):
             quality_keys = sorted([k for k in streams.keys() if isinstance(k, int)], reverse=True)
             if quality_keys:
@@ -60,7 +48,6 @@ class PornHubDownloader(BaseSiteDownloader):
         else:
             m3u8_url = streams
         
-        # Download and convert
         result_path = downloader.download_stream(m3u8_url, preferred_quality=quality)
         
         return str(result_path)
@@ -69,16 +56,12 @@ class PornHubDownloader(BaseSiteDownloader):
 
         downloader = CustomHLSDownloader()
         
-        # Extract streams and title
         streams = downloader.extract_video_info(url)
         
-        # Get video ID
         video_id = downloader.extract_video_id(url)
         
-        # Extract title from auto-detected filename
         title = downloader.output_name.stem if downloader.output_name else "Unknown"
         
-        # Get available qualities
         available_qualities = []
         if isinstance(streams, dict):
             available_qualities = sorted([k for k in streams.keys() if isinstance(k, int)], reverse=True)
@@ -108,7 +91,6 @@ class PornHubDownloader(BaseSiteDownloader):
 
 
 class PornHubSearch(BaseSiteSearch):
-    """PornHub.com search implementation."""
     
     def __init__(self):
         self.searcher = OriginalPornHubSearch()
@@ -125,7 +107,6 @@ class PornHubSearch(BaseSiteSearch):
         try:
             results = self.searcher.search(query, page=page, sort_by=sort_by, duration=duration)
             
-            # Add site field to each result
             for result in results:
                 result["site"] = "pornhub"
             

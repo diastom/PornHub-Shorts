@@ -1,5 +1,3 @@
-"""YAML configuration system for RedLight DL."""
-
 import yaml
 from pathlib import Path
 from typing import Optional, Dict, Any

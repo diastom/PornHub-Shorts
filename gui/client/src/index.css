@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --bg-accent: #1f1f1f;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  
+  --accent-color: #ff0055; /* Cyberpunk Red/Pink */
+  --accent-glow: rgba(255, 0, 85, 0.5);
+  --accent-blue: #00f0ff;
+  
+  --font-main: 'Outfit', sans-serif;
+  
+  --transition-speed: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none; /* App-like feel */
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: transparent; /* Allow WebView2 transparency if needed */
+  color: var(--text-primary);
+  overflow: hidden; /* Prevent body scroll, handle in containers */
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background-color: var(--bg-primary); /* Fallback */
+  border-radius: 8px; /* Slight rounding for floating window feel if needed */
+  overflow: hidden;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff3377;
+}

@@ -21,15 +21,6 @@ from ..aria2_downloader import IsAria2cAvailable
 
 
 def select_quality_interactive(url: str) -> str:
-    """
-    Fetch video information and let user select from actual available qualities.
-    
-    Args:
-        url: Video URL
-        
-    Returns:
-        Selected quality string (e.g., 'best', '720', 'worst')
-    """
     try:
         with console.status("[bold cyan]🔍 Fetching video information...", spinner="dots"):
             info = GetVideoInfo(url)
@@ -79,7 +70,6 @@ def select_quality_interactive(url: str) -> str:
 
 
 def _select_generic_quality() -> str:
-    """Fallback to generic quality selection if video info fetch fails."""
     console.print("\n[bold yellow]📺 Select Quality:[/]")
     quality_table = Table(show_header=False, box=box.SIMPLE)
     quality_table.add_column("Option", style="cyan", width=12)
@@ -99,7 +89,6 @@ def _select_generic_quality() -> str:
 
 
 def search_cli_mode(query, sort_by="mostviewed", duration=None):
-    """Search from CLI with provided query (Moved from search.py)"""
     searcher = PornHubSearch()
     page = 1
     
@@ -113,7 +102,6 @@ def search_cli_mode(query, sort_by="mostviewed", duration=None):
             console.print("[yellow]No results found.[/]")
             break
         
-        # Display results
         table = Table(title=f"Search Results - Page {page}", box=box.ROUNDED)
         table.add_column("#", style="cyan", width=4)
         table.add_column("Title", style="white")
@@ -134,7 +122,6 @@ def search_cli_mode(query, sort_by="mostviewed", duration=None):
         
         console.print(table)
         
-        # Action menu
         console.print("\n[bold cyan]Actions:[/]")
         console.print("  [1-N] - Download video by number")
         console.print("  [N]ext page")
@@ -168,8 +155,8 @@ def search_cli_mode(query, sort_by="mostviewed", duration=None):
         else:
             console.print("[red]Invalid action[/]")
 
+
 def interactive_mode():
-    """Interactive mode with beautiful prompts"""
 
     show_banner()
     
@@ -219,13 +206,11 @@ def interactive_mode():
                 break
                 
         elif choice == "2":
-            # Multi-site search
 
             
             registry = SiteRegistry()
             sites = registry.get_all_sites()
             
-            # Show site selection menu
             console.print("\n[bold cyan]🔍 Select Search Site:[/]")
             for idx, site in enumerate(sites, 1):
                 console.print(f"{idx}. [bold]{site['display_name']}[/]")
@@ -237,23 +222,18 @@ def interactive_mode():
                 default="1"
             )
             
-            # Get search query
             query = Prompt.ask("\n[bold green]🔎 Enter search query[/]")
             if not query:
                 continue
             
-            # Perform search based on selection
             if int(site_choice) == len(sites) + 1:
-                # Search all sites
                 console.print(f"\n[cyan]Searching all sites for: {query}...[/]\n")
                 multi_search = MultiSiteSearch()
                 all_results = multi_search.search_all(query)
                 
-                # Save to history
                 db.add_search_entry("all", query, "", len(all_results))
                 
                 if all_results:
-                    # Create Rich Table
                     table = Table(title=f"🔍 Search Results: {query} (All Sites)", box=box.ROUNDED)
                     table.add_column("#", style="cyan", width=4)
                     table.add_column("Site", style="magenta", width=10)
@@ -274,7 +254,6 @@ def interactive_mode():
                 else:
                     console.print("[yellow]No results found[/]")
             else:
-                # Search specific site
                 site_name = sites[int(site_choice) - 1]["name"]
                 searcher = registry.get_search_by_name(site_name)
                 
@@ -282,18 +261,15 @@ def interactive_mode():
                     console.print(f"\n[cyan]Searching {site_name.title()} for: {query}...[/]\n")
                     results = searcher.search(query)
                     
-                    # Save to history
                     db.add_search_entry(site_name, query, "", len(results))
                     
                     if results:
-                        # Create Rich Table
                         table = Table(title=f"🔍 Search Results: {query} ({site_name.title()})", box=box.ROUNDED)
                         table.add_column("#", style="cyan", width=4)
                         table.add_column("Title", style="white")
                         table.add_column("URL", style="blue", overflow="fold")
                         table.add_column("Duration", style="yellow", width=10)
                         
-                        # Add views column if available (PornHub has it)
                         has_views = any('views' in r and r.get('views') for r in results[:5])
                         if has_views:
                             table.add_column("Views", style="green", width=12)
@@ -320,27 +296,21 @@ def interactive_mode():
             Prompt.ask("\n[dim]Press Enter to return to menu...[/]")
             
         elif choice == "3":
-            # Batch Download
             batch_download_interactive()
             
         elif choice == "4":
-            # Playlist/Channel Download
             channel_download_interactive()
             
         elif choice == "5":
-            # Enhanced History Menu
             history_menu_interactive()
             
         elif choice == "6":
-            # Enhanced Statistics Menu
             statistics_menu_interactive()
             
         elif choice == "7":
-            # Active Downloads (Resume/Pause)
             active_downloads_menu()
         
         elif choice == "8":
-            # Settings Menu
             settings_menu_interactive()
             
         elif choice == "9":
@@ -349,15 +319,12 @@ def interactive_mode():
 
 
 def batch_download_interactive():
-    """Interactive batch download with progress tracking"""
     console.print("\n[bold cyan]📦 Batch Download Multiple Videos[/]")
     
-    # Get URLs
     urls_input = Prompt.ask("\n[bold green]🔗 Enter Video URLs (separated by commas)[/]")
     if not urls_input:
         return
     
-    # Parse URLs
     urls = [url.strip() for url in urls_input.split(',') if url.strip()]
     
     if not urls:
@@ -366,7 +333,6 @@ def batch_download_interactive():
     
     console.print(f"\n[cyan]Found {len(urls)} URL(s)[/]")
     
-    # Download mode selection
     console.print("\n[bold yellow]📥 Download Mode:[/]")
     console.print("1. Sequential (one-by-one) - Slower but more stable")
     console.print("2. Concurrent (simultaneous) - Faster but uses more resources")
@@ -382,14 +348,11 @@ def batch_download_interactive():
     else:
         max_workers = 1
     
-    # Quality selection
     console.print("\n[bold yellow]📺 Select Quality:[/]")
     q_choice = Prompt.ask(
         "   Quality (best/1080/720/480/worst)",
         default="best"
     )
-    
-    # Start batch download
 
     
     console.print(f"\n[bold cyan]🚀 Starting {'concurrent' if concurrent else 'sequential'} download...[/]\n")
@@ -421,8 +384,7 @@ def batch_download_interactive():
         completed_count = 0
         
         def on_progress_callback(completed, total, current_url):
-            # This gets called during download
-            pass  # We'll update in on_complete instead
+            pass
         
         def on_complete_callback(url, path):
             nonlocal completed_count
@@ -444,7 +406,6 @@ def batch_download_interactive():
             on_error=on_error_callback
         )
     
-    # Summary
     console.print(f"\n[bold green]✅ Batch Download Complete![/]")
     console.print(f"[cyan]Successfully downloaded:[/] {len(results)}/{len(urls)}")
     if errors:
@@ -454,18 +415,13 @@ def batch_download_interactive():
 
 
 def channel_download_interactive():
-    """Interactive channel/playlist download"""
     console.print("\n[bold cyan]📺 Download Channel or Playlist[/]")
     
-    # Get Target
     target = Prompt.ask("\n[bold green]🔗 Enter Channel/User URL or Name[/]")
     if not target:
         return
         
-    # Get Limit
     limit = int(Prompt.ask("   [cyan]Max videos to download[/]", default="10"))
-    
-    # Scan
 
     playlist = PlaylistDownloader()
     
@@ -478,11 +434,9 @@ def channel_download_interactive():
         
     console.print(f"[green]✓ Found {len(urls)} videos[/]")
     
-    # Confirm
     if not Confirm.ask(f"\n[bold yellow]📥 Download {len(urls)} videos?[/]", default=True):
         return
         
-    # Download Mode
     console.print("\n[bold yellow]📥 Download Mode:[/]")
     console.print("1. Sequential (one-by-one)")
     console.print("2. Concurrent (simultaneous)")
@@ -490,11 +444,8 @@ def channel_download_interactive():
     mode_choice = Prompt.ask("   Select mode", choices=["1", "2"], default="1")
     concurrent = mode_choice == "2"
     
-    # Quality
     console.print("\n[bold yellow]📺 Select Quality:[/]")
     q_choice = Prompt.ask("   Quality (best/1080/720/480/worst)", default="best")
-    
-    # Start Batch Download
 
     
     downloader = BatchDownloader(
@@ -505,7 +456,6 @@ def channel_download_interactive():
     
     downloader.AddUrls(urls)
     
-    # Progress tracking (copied from batch_download_interactive for consistency)
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -547,7 +497,6 @@ def channel_download_interactive():
 
 
 def history_menu_interactive():
-    """Enhanced history menu with export and management options."""
     while True:
         console.print("\n[bold magenta]📜 Download History Menu[/]")
         console.print("1. [bold]View Recent History[/]")
@@ -570,9 +519,10 @@ def history_menu_interactive():
             console.print("2. Eporner")
             console.print("3. SpankBang")
             console.print("4. XVideos")
+            console.print("5. XHamster")
             
-            site_choice = Prompt.ask("   Site", choices=["1", "2", "3", "4"], default="1")
-            site_map = {"1": "pornhub", "2": "eporner", "3": "spankbang", "4": "xvideos"}
+            site_choice = Prompt.ask("   Site", choices=["1", "2", "3", "4", "5"], default="1")
+            site_map = {"1": "pornhub", "2": "eporner", "3": "spankbang", "4": "xvideos", "5": "xhamster"}
             db.show_history(console, limit=20, site=site_map[site_choice])
             Prompt.ask("\n[dim]Press Enter to continue...[/]")
             
@@ -605,7 +555,6 @@ def history_menu_interactive():
 
 
 def statistics_menu_interactive():
-    """Enhanced statistics menu with detailed views."""
     stats = GetStatistics()
     
     while True:
@@ -645,13 +594,11 @@ def statistics_menu_interactive():
 
 
 def active_downloads_menu():
-    """Menu to manage active and paused downloads (Resume/Pause)."""
     manager = GetResumeManager()
     
     while True:
         console.print("\n[bold cyan]⏯️ Active Downloads Manager[/]")
         
-        # Get downloads
         active = manager.list_active_downloads()
         paused = manager.list_paused_downloads()
         failed = manager.list_failed_downloads()
@@ -662,21 +609,18 @@ def active_downloads_menu():
             Prompt.ask("\n[dim]Press Enter to return...[/]")
             break
         
-        # Show active downloads
         if active:
             console.print("\n[bold green]📥 Active Downloads:[/]")
             for i, d in enumerate(active, 1):
                 progress = (d.downloaded_size / d.total_size * 100) if d.total_size > 0 else 0
                 console.print(f"  {i}. [cyan]{d.download_id}[/] - {d.title[:40]} ({progress:.1f}%)")
         
-        # Show paused downloads
         if paused:
             console.print("\n[bold yellow]⏸️ Paused Downloads:[/]")
             for i, d in enumerate(paused, 1):
                 progress = (d.downloaded_size / d.total_size * 100) if d.total_size > 0 else 0
                 console.print(f"  {i}. [cyan]{d.download_id}[/] - {d.title[:40]} ({progress:.1f}%)")
         
-        # Show failed downloads
         if failed:
             console.print("\n[bold red]❌ Failed Downloads (Resumable):[/]")
             for i, d in enumerate(failed, 1):
@@ -728,14 +672,12 @@ def active_downloads_menu():
 
 
 def settings_menu_interactive():
-    """Settings menu for notifications, config, and other preferences."""
     notifier = GetNotifier()
     config = GetConfig()
     
     while True:
         console.print("\n[bold dark_orange]⚙️ Settings[/]")
         
-        # Show current settings
         notif_status = "[green]Enabled[/]" if notifier.config.enabled else "[red]Disabled[/]"
         sound_status = "[green]Enabled[/]" if notifier.config.sound_enabled else "[red]Disabled[/]"
         aria2c_status = "[green]Available[/]" if IsAria2cAvailable() else "[yellow]Not installed[/]"
@@ -843,7 +785,7 @@ def settings_menu_interactive():
             
         elif choice == "8":
             config_path = ConfigManager.DEFAULT_CONFIG_PATH
-            CreateDefaultConfig()  # Ensure it exists
+            CreateDefaultConfig()
             console.print(f"\n[bold]Config File Location:[/]")
             console.print(f"  [cyan]{config_path}[/]")
             console.print("\n[dim]Edit this file directly for advanced settings.[/]")
@@ -852,7 +794,7 @@ def settings_menu_interactive():
         elif choice == "9":
             if Confirm.ask("[bold red]Reset all settings to defaults?[/]", default=False):
                 ResetConfig()
-                config = GetConfig()  # Reload
+                config = GetConfig()
                 console.print("[green]✓ Settings reset to defaults[/]")
             Prompt.ask("\n[dim]Press Enter to continue...[/]")
             
@@ -869,3 +811,7 @@ def settings_menu_interactive():
             
         elif choice == "11":
             break
+
+
+def save_config(config):
+    SaveConfig(config)

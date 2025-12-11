@@ -1,5 +1,3 @@
-"""Enhanced progress bar with speed and ETA display."""
-
 import time
 from typing import Optional, Callable
 
@@ -13,7 +11,6 @@ from rich.console import Console
 
 
 class SpeedColumn(ProgressColumn):
-    """Custom speed column."""
     
     def render(self, task: Task) -> Text:
         speed = task.finished_speed or task.speed
@@ -23,7 +20,6 @@ class SpeedColumn(ProgressColumn):
 
 
 class ETAColumn(ProgressColumn):
-    """Custom ETA column."""
     
     def render(self, task: Task) -> Text:
         remaining = task.time_remaining
@@ -33,7 +29,6 @@ class ETAColumn(ProgressColumn):
 
 
 class ProgressCallback:
-    """Simple progress callback wrapper for downloads."""
     
     def __init__(self, on_progress: Optional[Callable[[int, int], None]] = None):
         self.on_progress = on_progress
@@ -79,7 +74,6 @@ class ProgressCallback:
 
 
 class EnhancedProgress:
-    """Progress manager with multiple tasks."""
     
     def __init__(self, console: Optional[Console] = None, show_speed: bool = True, show_eta: bool = True):
         self.console = console or Console()

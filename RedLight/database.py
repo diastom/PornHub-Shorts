@@ -10,12 +10,6 @@ from rich import box
 
 
 class DatabaseManager:
-    """
-    Enhanced database manager for download and search history.
-    
-    Supports extended metadata tracking including site, file size,
-    duration, and status. Provides export and advanced query capabilities.
-    """
     
     def __init__(self):
         self.db_path = Path.home() / ".RedLight" / "history.db"
@@ -23,11 +17,9 @@ class DatabaseManager:
         self.init_db()
 
     def init_db(self):
-        """Initialize database with enhanced schema."""
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         
-        # Download history table (enhanced)
         c.execute('''
             CREATE TABLE IF NOT EXISTS history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,10 +31,8 @@ class DatabaseManager:
             )
         ''')
         
-        # Add new columns if they don't exist (migration)
         self._migrate_history_table(c)
         
-        # Search history table
         c.execute('''
             CREATE TABLE IF NOT EXISTS search_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,12 +48,9 @@ class DatabaseManager:
         conn.close()
     
     def _migrate_history_table(self, cursor):
-        """Add new columns to history table if they don't exist."""
-        # Get existing columns
         cursor.execute("PRAGMA table_info(history)")
         existing_columns = {col[1] for col in cursor.fetchall()}
         
-        # Add new columns if missing
         new_columns = {
             'site': 'TEXT',
             'file_size': 'INTEGER DEFAULT 0',
@@ -76,7 +63,7 @@ class DatabaseManager:
                 try:
                     cursor.execute(f'ALTER TABLE history ADD COLUMN {column} {col_type}')
                 except sqlite3.OperationalError:
-                    pass  # Column might already exist
+                    pass
 
     def add_entry(
         self,
@@ -88,23 +75,10 @@ class DatabaseManager:
         file_size: int = 0,
         duration: str = None
     ):
-        """
-        Add a download entry to history.
-        
-        Args:
-            url: Video URL
-            title: Video title
-            filename: Downloaded filename
-            quality: Video quality
-            site: Source site name (optional)
-            file_size: File size in bytes (optional)
-            duration: Video duration string (optional)
-        """
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
             
-            # Infer site from URL if not provided
             if not site:
                 site = self._infer_site(url)
             
@@ -117,11 +91,9 @@ class DatabaseManager:
             conn.commit()
             conn.close()
         except Exception:
-            # Fail silently to not interrupt the user experience
             pass
     
     def _infer_site(self, url: str) -> str:
-        """Infer site name from URL."""
         if not url:
             return "unknown"
         url_lower = url.lower()
@@ -141,17 +113,6 @@ class DatabaseManager:
         site: str = None,
         quality: str = None
     ) -> List[Dict[str, Any]]:
-        """
-        Get download history with optional filters.
-        
-        Args:
-            limit: Maximum number of entries to return
-            site: Filter by site name (optional)
-            quality: Filter by quality (optional)
-            
-        Returns:
-            List of history entries as dictionaries
-        """
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -202,15 +163,6 @@ class DatabaseManager:
             return []
     
     def get_history_by_url(self, url: str) -> Optional[Dict[str, Any]]:
-        """
-        Get history entry by URL.
-        
-        Args:
-            url: Video URL to search for
-            
-        Returns:
-            History entry dictionary or None
-        """
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -236,16 +188,6 @@ class DatabaseManager:
             return None
     
     def clear_history(self, older_than_days: int = None) -> int:
-        """
-        Clear download history.
-        
-        Args:
-            older_than_days: Only clear entries older than this many days.
-                           If None, clears all history.
-                           
-        Returns:
-            Number of entries deleted
-        """
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -266,16 +208,6 @@ class DatabaseManager:
             return 0
     
     def export_history(self, format: str = 'json', filepath: str = None) -> str:
-        """
-        Export download history to file.
-        
-        Args:
-            format: Export format ('json' or 'csv')
-            filepath: Output file path. If None, returns as string.
-            
-        Returns:
-            Exported data as string, or filepath if saved to file
-        """
         history = self.get_history(limit=10000)
         
         if format == 'json':
@@ -299,14 +231,6 @@ class DatabaseManager:
         return output
 
     def show_history(self, console: Console, limit: int = 10, site: str = None):
-        """
-        Display download history in a rich table.
-        
-        Args:
-            console: Rich console instance
-            limit: Maximum entries to show
-            site: Filter by site (optional)
-        """
         history = self.get_history(limit=limit, site=site)
 
         if not history:
@@ -332,7 +256,6 @@ class DatabaseManager:
             except:
                 formatted_date = str(entry['date_downloaded'])
             
-            # Format file size
             size = entry.get('file_size', 0) or 0
             if size > 0:
                 if size > 1024 * 1024 * 1024:
@@ -344,7 +267,6 @@ class DatabaseManager:
             else:
                 size_str = "-"
             
-            # Truncate title if too long
             title_text = entry['title'] or "Unknown"
             if len(title_text) > 40:
                 title_text = title_text[:37] + "..."
@@ -362,7 +284,6 @@ class DatabaseManager:
         console.print(f"\n[dim]Showing {len(history)} of {self._get_total_count()} total downloads[/]")
     
     def _get_total_count(self) -> int:
-        """Get total number of history entries."""
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -374,11 +295,9 @@ class DatabaseManager:
             return 0
 
     def show_stats(self, console: Console):
-        """Display download statistics with enhanced information."""
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         
-        # Total downloads
         c.execute('SELECT COUNT(*) FROM history')
         total = c.fetchone()[0]
         
@@ -387,18 +306,15 @@ class DatabaseManager:
             conn.close()
             return
 
-        # Quality stats
         c.execute('SELECT quality, COUNT(*) FROM history GROUP BY quality ORDER BY COUNT(*) DESC')
         quality_stats = c.fetchall()
         
-        # Site stats (if column exists)
         try:
             c.execute('SELECT site, COUNT(*) FROM history WHERE site IS NOT NULL GROUP BY site ORDER BY COUNT(*) DESC')
             site_stats = c.fetchall()
         except:
             site_stats = []
         
-        # Total size (if column exists)
         try:
             c.execute('SELECT SUM(file_size) FROM history WHERE file_size > 0')
             total_size = c.fetchone()[0] or 0
@@ -407,7 +323,6 @@ class DatabaseManager:
         
         conn.close()
 
-        # Summary panel
         size_str = self._format_size(total_size)
         summary = f"[bold green]Total Downloads:[/] {total}\n"
         summary += f"[bold green]Total Size:[/] {size_str}\n"
@@ -417,7 +332,6 @@ class DatabaseManager:
         
         console.print(Panel(summary, title="📊 Download Statistics", border_style="cyan"))
         
-        # Quality distribution table
         table = Table(title="📺 Quality Distribution", box=box.ROUNDED)
         table.add_column("Quality", style="magenta")
         table.add_column("Count", style="green", justify="right")
@@ -432,7 +346,6 @@ class DatabaseManager:
 
         console.print(table)
         
-        # Site distribution table
         if site_stats:
             site_table = Table(title="🌐 Downloads by Site", box=box.ROUNDED)
             site_table.add_column("Site", style="cyan")
@@ -447,7 +360,6 @@ class DatabaseManager:
             console.print(site_table)
     
     def _format_size(self, size_bytes: int) -> str:
-        """Format bytes to human-readable size."""
         if size_bytes <= 0:
             return "N/A"
         for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
@@ -457,7 +369,6 @@ class DatabaseManager:
         return f"{size_bytes:.1f} PB"
     
     def add_search_entry(self, site: str, query: str, filters: str, results_count: int):
-        """Add a search entry to history."""
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -471,7 +382,6 @@ class DatabaseManager:
             pass
     
     def get_search_history(self, limit: int = 20) -> list:
-        """Get search history entries."""
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -486,7 +396,6 @@ class DatabaseManager:
             return []
     
     def clear_search_history(self) -> int:
-        """Clear all search history."""
         try:
             conn = sqlite3.connect(self.db_path)
             c = conn.cursor()
@@ -499,7 +408,6 @@ class DatabaseManager:
             return 0
     
     def show_search_history(self, console: Console, limit: int = 20):
-        """Display search history in a rich table."""
         rows = self.get_search_history(limit)
         
         if not rows:

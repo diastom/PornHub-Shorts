@@ -17,7 +17,7 @@ Complete guide to using RedLight DL with all supported adult content sites.
 
 ## Overview
 
-RedLight DL supports **4 major adult content sites** with intelligent auto-detection. Simply paste any supported URL and RedLight will automatically use the correct downloader.
+RedLight DL supports **6 major adult content sites** with intelligent auto-detection. Simply paste any supported URL and RedLight will automatically use the correct downloader.
 
 ### Key Features
 
@@ -65,6 +65,24 @@ RedLight DL supports **4 major adult content sites** with intelligent auto-detec
   - Multiple quality options
   - Intelligent fallback system
   - Both MP4 and HLS support
+  - Fast downloads
+
+### 5. xHamster 🔥
+- **Technology**: HLS Streaming
+- **Qualities**: 144p, 240p, 480p, 720p, 1080p
+- **Special Features**:
+  - Multi-quality HLS support
+  - Geo-restriction fallback domains
+  - Automatic domain switching
+  - CustomHLSDownloader integration
+
+### 6. XNXX 📺
+- **Technology**: Multi-quality MP4/HLS
+- **Qualities**: 360p, 720p, 1080p
+- **Special Features**:
+  - Same structure as XVideos
+  - Multiple quality options
+  - HLS adaptive streaming
   - Fast downloads
 
 ---

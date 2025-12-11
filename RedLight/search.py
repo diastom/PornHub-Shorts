@@ -5,6 +5,7 @@ import re
 
 console = Console()
 
+
 class PornHubSearch:
     def __init__(self):
         self.base_url = "https://www.pornhub.com"
@@ -15,9 +16,7 @@ class PornHubSearch:
         })
     
     def search(self, query, page=1, sort_by="mostviewed", duration=None):
-        """Search PornHub and return list of video results."""
         try:
-            # Map sort options
             sort_map = {
                 'mostviewed': 'mv',
                 'toprated': 'tr',
@@ -25,8 +24,6 @@ class PornHubSearch:
             }
             sort_param = sort_map.get(sort_by, 'mv')
             
-            # Map duration options
-            # short < 10min, medium 10-20min, long > 20min
             duration_map = {
                 'short': '10minus',
                 'medium': '10-20',
@@ -43,7 +40,6 @@ class PornHubSearch:
             soup = BeautifulSoup(response.text, 'html.parser')
             videos = []
             
-            # Try multiple selectors
             selectors = [
                 ('div', 'phimage'),
                 ('li', 'pcVideoListItem'),
@@ -58,9 +54,8 @@ class PornHubSearch:
                     break
             
             if not video_items:
-                # Fallback: Try to find any links that look like video links
                 all_links = soup.find_all('a', href=re.compile(r'/view_video\.php\?viewkey='))
-                for link in all_links[:20]:  # Limit to first 20
+                for link in all_links[:20]:
                     try:
                         url = link.get('href', '')
                         if not url.startswith('http'):
@@ -90,7 +85,6 @@ class PornHubSearch:
                     if not link.startswith('http'):
                         link = f"{self.base_url}{link}"
                     
-                    # Extract title
                     title_elem = link_elem.get('title', '')
                     if not title_elem:
                         img_elem = link_elem.find('img')
@@ -99,7 +93,6 @@ class PornHubSearch:
                     
                     title = title_elem.strip() if title_elem else 'Unknown Title'
                     
-                    # Extract duration
                     duration = 'Unknown'
                     parent = item.find_parent('li')
                     if parent:
@@ -107,7 +100,6 @@ class PornHubSearch:
                         if duration_elem:
                             duration = duration_elem.text.strip()
                     
-                    # Extract views
                     views = 'Unknown'
                     if parent:
                         views_elem = parent.find(class_='views')
@@ -128,5 +120,3 @@ class PornHubSearch:
         except Exception as e:
             console.print(f"[red]Search failed: {e}[/]")
             return []
-    
-

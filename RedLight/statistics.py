@@ -1,5 +1,3 @@
-"""Download statistics and analytics for RedLight DL."""
-
 import sqlite3
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -13,7 +11,6 @@ from rich import box
 
 
 class DownloadStatistics:
-    """Download history analytics with rich display."""
     
     def __init__(self, db_path: Optional[str] = None):
         self.db_path = Path(db_path) if db_path else Path.home() / ".RedLight" / "history.db"
@@ -207,8 +204,6 @@ class DownloadStatistics:
             conn.close()
         
         return result
-    
-    # Display methods
     
     def show_dashboard(self, console: Optional[Console] = None):
         console = console or self.console

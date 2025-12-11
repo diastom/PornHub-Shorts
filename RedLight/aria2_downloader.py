@@ -1,5 +1,3 @@
-"""Fast downloads with aria2c and multi-threaded fallback."""
-
 import os
 import shutil
 import subprocess
@@ -17,7 +15,6 @@ def IsAria2cAvailable() -> bool:
 
 
 class Aria2cDownloader:
-    """High-speed downloads using aria2c."""
     
     def __init__(self, connections: int = 16, speed_limit: str = "", timeout: int = 30):
         self.connections = connections
@@ -52,7 +49,7 @@ class Aria2cDownloader:
             "--console-log-level=error",
             "--summary-interval=1",
             "--download-result=hide",
-            "-c",  # Continue
+            "-c",
         ]
         
         if self.speed_limit:
@@ -111,7 +108,6 @@ class Aria2cDownloader:
 
 
 class PythonDownloader:
-    """Multi-threaded Python fallback downloader."""
     
     def __init__(self, connections: int = 4, chunk_size: int = 1024 * 1024, timeout: int = 30):
         self.connections = connections
@@ -134,7 +130,6 @@ class PythonDownloader:
         if headers:
             session.headers.update(headers)
         
-        # Check size and range support
         try:
             head = session.head(url, timeout=self.timeout, allow_redirects=True)
             total_size = int(head.headers.get('content-length', 0))
@@ -143,7 +138,6 @@ class PythonDownloader:
             total_size = 0
             supports_range = False
         
-        # Use simple download if no range support or small file
         if not supports_range or total_size < self.chunk_size * 2:
             return self._simple_download(session, url, output, on_progress, total_size)
         
@@ -217,7 +211,6 @@ class PythonDownloader:
             shutil.rmtree(temp_dir, ignore_errors=True)
             return False
         
-        # Merge
         try:
             with open(output, 'wb') as out:
                 for i in range(self.connections):
@@ -234,7 +227,6 @@ class PythonDownloader:
 
 
 def get_fast_downloader(prefer_aria2c: bool = True, connections: int = 16):
-    """Get best available downloader."""
     if prefer_aria2c and IsAria2cAvailable():
         return Aria2cDownloader(connections=connections)
     return PythonDownloader(connections=min(connections, 8))

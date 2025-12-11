@@ -1,5 +1,43 @@
 ﻿# Release Notes - RedLight DL
 
+## Version 1.0.15 (2025-12-11)
+
+### 🎉 New Site Support
+
+#### xHamster.com ⭐
+- **Full Integration**: Download videos from xHamster with multi-quality selection
+- **HLS Streaming**: Uses CustomHLSDownloader for reliable downloads
+- **Geo-Fallback**: Automatic domain fallback (xhamster2.com, xhamster.desi) for geo-restricted regions
+- **Quality Options**: 144p, 240p, 480p, 720p, 1080p
+- **Search Support**: Full search with pagination
+
+#### XNXX.com ⭐
+- **Full Integration**: Download videos from XNXX with quality selection
+- **Same Structure as XVideos**: Uses html5player API pattern
+- **Quality Options**: Low, High, HLS Adaptive
+- **Search Support**: Full search with pagination
+
+### 📦 New Modules
+- `sites/xhamster.py` - xHamster downloader and search
+- `sites/xnxx.py` - XNXX downloader and search
+
+### 🔧 Changes
+- Site count increased from 4 to 6
+- Updated README.md with new sites
+- Updated docs/QuickStart.md and docs/MultiSite.md
+- Updated examples with new site references
+- All existing code continues to work (backward compatible)
+
+### 📝 Supported Sites (6 Total)
+- **PornHub** - HLS streaming downloads
+- **Eporner** - Direct MP4 with aria2c
+- **Spankbang** - Hybrid MP4/HLS with 4K support
+- **XVideos** - Multi-quality MP4/HLS
+- **xHamster** - HLS with geo-fallback (NEW)
+- **XNXX** - Multi-quality MP4/HLS (NEW)
+
+---
+
 ## Version 1.0.14 (2025-12-07)
 
 ### 🎉 Major New Features

@@ -1,5 +1,3 @@
-"""Smart retry with exponential backoff for RedLight DL."""
-
 import time
 import random
 import functools
@@ -7,7 +5,6 @@ from typing import Callable, Tuple, Type, Optional
 
 
 class RetryError(Exception):
-    """Raised when all retries are exhausted."""
     def __init__(self, message: str, last_exception: Optional[Exception] = None):
         super().__init__(message)
         self.last_exception = last_exception
@@ -22,7 +19,6 @@ def smart_retry(
     exceptions: Tuple[Type[Exception], ...] = (Exception,),
     on_retry: Optional[Callable] = None
 ):
-    """Decorator for retrying with exponential backoff."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -53,7 +49,6 @@ def smart_retry(
 
 
 class RetryHandler:
-    """Context manager for retry operations."""
     
     def __init__(
         self,
@@ -110,7 +105,6 @@ def retry_with_backoff(
     base_delay: float = 1.0,
     exceptions: Tuple[Type[Exception], ...] = (Exception,)
 ):
-    """Simple function for single-use retry."""
     handler = RetryHandler(max_attempts=max_attempts, base_delay=base_delay)
     
     while True:

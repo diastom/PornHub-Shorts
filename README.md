@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.14-blue.svg)
+![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/ph-shorts?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/ph-shorts)
@@ -60,13 +60,15 @@ pip install .
 - **Eporner** - Direct MP4 downloads with aria2c support
 - **Spankbang** - Hybrid Delivery MP4/HLS with aria2c support (4K!)
 - **XVideos** - Multi-quality MP4/HLS downloads with intelligent fallback
+- **xHamster** - HLS streaming with multi-quality and geo-fallback support
+- **XNXX** - Multi-quality MP4/HLS downloads (same structure as XVideos)
 
 ---
 
 ## ✨ Features
 
 ### Core Features
-- **Multi-Site Support** - Download from 4 adult content sites
+- **Multi-Site Support** - Download from 6 adult content sites
 - **Automatic Site Detection** - Just paste any supported URL
 - **Beautiful CLI** - Rich terminal UI with colors and progress bars
 - **Fast Downloads** - Multi-threaded + aria2c support (up to 16 connections)

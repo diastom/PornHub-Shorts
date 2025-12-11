@@ -95,6 +95,8 @@ from .sites.pornhub import PornHubDownloader
 from .sites.eporner import EpornerDownloader, EpornerSearch
 from .sites.spankbang import SpankBangDownloader, SpankBangSearch
 from .sites.xvideos import XVideosDownloader, XVideosSearch
+from .sites.xhamster import XHamsterDownloader, XHamsterSearch
+from .sites.xnxx import XNXXDownloader, XNXXSearch
 from .multi_search import MultiSiteSearch
 
 from .version import __version__, __author__, __description__
@@ -176,6 +178,10 @@ __all__ = [
     "SpankBangSearch",
     "XVideosDownloader",
     "XVideosSearch",
+    "XHamsterDownloader",
+    "XHamsterSearch",
+    "XNXXDownloader",
+    "XNXXSearch",
 ]
 
 

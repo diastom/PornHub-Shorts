@@ -1,5 +1,3 @@
-"""Resume manager for pausable/resumable downloads."""
-
 import sqlite3
 import uuid
 import json
@@ -58,7 +56,6 @@ class DownloadState:
 
 
 class ResumeManager:
-    """Manages pausable/resumable downloads with SQLite persistence."""
     
     def __init__(self, db_path: Optional[str] = None):
         self.db_path = Path(db_path) if db_path else Path.home() / ".RedLight" / "downloads.db"

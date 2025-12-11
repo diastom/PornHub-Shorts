@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def search_all_sites_example(query):
-    """Search across all 4 sites simultaneously"""
+    """Search across all 6 sites simultaneously"""
     
     print("="*60)
     print(f"Searching for: '{query}'")
@@ -140,12 +140,12 @@ def main():
 ╚════════════════════════════════════════════════════════════╝
     
 This example demonstrates:
-1. Searching across all 4 supported sites simultaneously
+1. Searching across all 6 supported sites simultaneously
 2. Grouping and displaying results by site
 3. Downloading top results from each site
 4. Organizing downloads by site in separate folders
 
-Supported sites: PornHub, Eporner, Spankbang, XVideos
+Supported sites: PornHub, Eporner, Spankbang, XVideos, xHamster, XNXX
     """)
     
     # Example 1: Simple search

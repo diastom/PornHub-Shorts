@@ -17,11 +17,13 @@ BANNER = """
 [bold cyan]║[/]  [bold magenta]╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   [/]   [bold cyan]║[/]
 [bold cyan]║[/]          [bold yellow]Professional Adult Content Downloader                [/]   [bold cyan]║[/]
 [bold cyan]╚══════════════════════════════════════════════════════════════════╝[/]
-                [dim]version 1.0.14 • RedLight DL[/]
+                [dim]version 2.1.0 • RedLight DL[/]
 """
+
 
 def show_banner():
     console.print(BANNER)
+
 
 def show_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
@@ -42,11 +44,13 @@ def show_version(ctx, param, value):
     console.print(version_info)
     ctx.exit()
 
+
 def show_history(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
     db.show_history(console)
     ctx.exit()
+
 
 def show_stats(ctx, param, value):
     if not value or ctx.resilient_parsing:
