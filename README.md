@@ -12,7 +12,7 @@
 *A powerful, feature-rich downloader with a beautiful CLI and comprehensive Python API*
 
 
-[Installation](#-installation) • [Features](#-features) • [Usage](#-usage) • [Examples](#-examples)
+[Installation](#-installation) • [Features](#-features) • [Usage CLI](#-usage-cli) • [Usage GUI](#-usage-gui-v211)
 
 </div>
 
@@ -22,7 +22,13 @@
 
 ## 📦 Installation
 
-### From PyPI ✅ (Recommended)
+### With [RedLightSetup.exe](https://github.com/diastom/RedLightDL/releases/download/v2.1.1/RedLightSetup.exe) file
+
+```bash
+just download and install it, no actions needed
+```
+
+### From PyPI ✅ 
 
 ```bash
 pip install ph-shorts
@@ -41,18 +47,6 @@ chmod +x install.sh
 install.bat
 ```
 
-### Manual Install from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/diastom/RedLightDL.git
-cd RedLightDL
-
-# Install
-pip install .
-```
-
----
 
 ## 🌐 Supported Sites
 
@@ -67,10 +61,10 @@ pip install .
 
 ## ✨ Features
 
-### Core Features
 - **Multi-Site Support** - Download from 6 adult content sites
 - **Automatic Site Detection** - Just paste any supported URL
 - **Beautiful CLI** - Rich terminal UI with colors and progress bars
+- **Awsome GUI** - a Beautiful GUI with C# and JS
 - **Fast Downloads** - Multi-threaded + aria2c support (up to 16 connections)
 - **Quality Selection** - Choose from available qualities (up to 4K!)
 - **Batch Downloads** - Download multiple videos concurrently
@@ -81,18 +75,29 @@ pip install .
 - **Python API** - Use as a library for automation
 - **Async Support** - Perfect for bot integration
 
-### NEW in v1.0.14 ✨
-- **⏯️ Resume/Pause** - Pause downloads and resume later
-- **⚙️ Config File** - YAML-based persistent settings
-- **🔔 Notifications** - Desktop alerts on download completion
-- **📊 Statistics** - Comprehensive download analytics dashboard
-- **⚡ Aria2c Integration** - Multi-connection fast downloads
-- **📈 Speed/ETA Display** - Real-time transfer speed and ETA
+### NEW in v2.1.1 ✨
+- **🌐 GUI** - Use the GUI for easy download
+- **🔞 Site Support** - added new sites to the support list
 
 
 ---
 
-## 🚀 Usage
+## 🚀 Usage (GUI) v2.1.1+
+
+download the [RedLightSetup.exe](https://github.com/diastom/RedLightDL/releases/download/v2.1.1/RedLightSetup.exe) file
+
+and simply install the app, after that you can open **RedLight DL** app and use it!
+
+some screenshots from the GUI app:
+
+<img width="1919" height="1109" alt="Screenshot 2025-12-12 152928" src="https://github.com/user-attachments/assets/b0069142-93ff-4fe8-abe2-58502582e0d1" />
+
+
+<img width="1919" height="1107" alt="Screenshot 2025-12-12 153151" src="https://github.com/user-attachments/assets/e1209e49-744e-45b1-8a79-a08282541914" />
+
+
+
+## 🚀 Usage (CLI)
 
 ### Interactive Mode (Recommended for beginners)
 
@@ -114,7 +119,7 @@ You'll get a beautiful interactive menu:
 ║  ╚═╝  ╚═╝╚══════╝╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ║
 ║          Professional Adult Content Downloader                   ║
 ╚══════════════════════════════════════════════════════════════════╝
-                    version 1.0.14 • RedLight DL
+                    version 2.1.1 • RedLight DL
 ```
 
 
@@ -133,17 +138,6 @@ ph-shorts "URL" -o my_video.mp4
 # Use proxy
 ph-shorts "URL" -p http://127.0.0.1:1080
 ```
-
----
-
-
-## Examples
-
-Check the [`examples/`](examples/) directory for complete working examples:
-- [`basic_usage.py`](examples/basic_usage.py) - Multi-site basics
-- [`multi_site_search.py`](examples/multi_site_search.py) - Search all sites
-- [`multi_site_download.py`](examples/multi_site_download.py) - Batch downloads
-- [`site_specific_features.py`](examples/site_specific_features.py) - Site features
 
 ---
 
